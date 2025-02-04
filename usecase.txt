@@ -1,0 +1,23 @@
+@startuml
+actor User
+actor Admin
+left to right direction
+
+User -- (watch_menu)
+User -- (watch_cart)
+User -- (sel_address)
+User -- (history)
+Admin -- (watch_menu)
+Admin -- (watch_order)
+
+
+(watch_menu)<.down.(find_menu):<<extend>>
+(watch_menu)<.down.(Show_detail_menu):<<extend>>
+(Show_detail_menu)<.down.(add_cart):<<extend>>
+(watch_cart)<.down.(add_minus_item):<<extend>>
+(watch_cart)<.down.(check_out):<<extend>>
+(watch_order) <.down. (change_order) : <<extend>>
+(check_out)<.down.(order_detail):<<extend>>
+(order_detail)<.down.(payment_method):<<extend>>
+(Show_detail_menu).down.>(find_menu):<<extend>>
+@enduml
