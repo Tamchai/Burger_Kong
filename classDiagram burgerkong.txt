@@ -1,0 +1,59 @@
+classDiagram
+
+    class Order{
+        -str order_id
+        -str status
+        -instance Member
+        -float total_price
+        -instance Cart
+        -instance Payment
+    }
+    class Menu{
+        -str category
+        -str menu_id
+        -str name
+        -float price
+        -str detail
+    }
+    class Menu_set{
+        -list menu_set_list[]
+    }
+    class Beverage{
+        -str size
+    }
+    class Burger{
+        -str addon
+    }
+    class Snack{
+        -
+    }
+    class Payment{
+        -ste payment_id
+        -str date
+        -str amount
+        -str status
+    }
+    class Cart{
+       -list item_list[]
+    }
+    class User{
+        -str name
+        -str tel
+        -str password
+    }
+    class Admin{
+        -str type
+    }
+    class Member{
+        -instance History
+        -instance Address
+        -instance Payment
+    }
+    class Address{
+        -str name
+        -str detail
+    }
+    class History{
+        -str order_id
+
+    }
