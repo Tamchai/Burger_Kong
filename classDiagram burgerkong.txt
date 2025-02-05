@@ -1,4 +1,4 @@
-classDiagram
+          classDiagram
 
     class Order{
         -str order_id
@@ -7,6 +7,10 @@ classDiagram
         -float total_price
         -instance Cart
         -instance Payment
+        +addItem()
+        +removeItem()
+        +calculateTotal()
+        +checkout()
     }
     class Menu{
         -str category
@@ -14,15 +18,21 @@ classDiagram
         -str name
         -float price
         -str detail
+        +getDetails()
     }
     class Menu_set{
         -list menu_set_list[]
+        +addMenuItem()
+        +removeMenuItem()
+        +getTotalPrice()
     }
     class Beverage{
         -str size
+        +setSize(str size)
     }
     class Burger{
         -str addon
+        +addAddon(str addon)
     }
     class Snack{
         -
@@ -32,28 +42,59 @@ classDiagram
         -str date
         -str amount
         -str status
+        +processPayment()
+        +refundPayment()
     }
     class Cart{
        -list item_list[]
+        +addItem()
+        +removeItem()
+        +getTotal()
     }
     class User{
         -str name
         -str tel
         -str password
+        +login()
+        +logout()
+        +updateProfile()
     }
     class Admin{
         -str type
+        +manageMenu()
+        +viewOrders()
     }
     class Member{
         -instance History
         -instance Address
         -instance Payment
+        +placeOrder()
+        +viewOrderHistory()
+        +updateAddress()
     }
     class Address{
         -str name
         -str detail
+        +updateAddress()
     }
     class History{
         -str order_id
-
+        +viewOrderHistory()
     }
+
+    User <|-- Member
+    User <|-- Admin  
+    Menu <|-- Snack
+    Menu <|-- Menu_set
+    Menu <|-- Beverage
+    Menu <|-- Burger
+
+    Member --> History
+    Member --> Payment
+    Member --> Address
+
+    Order --> Payment
+    Order --> Cart
+    Order --> Member
+
+    Cart --> Menu 
