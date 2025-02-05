@@ -1,4 +1,4 @@
-          classDiagram
+classDiagram
 
     class Order{
         -str order_id
