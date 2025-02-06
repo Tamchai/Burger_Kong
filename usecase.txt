@@ -6,11 +6,11 @@ left to right direction
 User -- (watch_menu)
 User -- (watch_cart)
 User -- (sel_address)
-User -- (history)
 Admin -- (watch_menu)
 Admin -- (watch_order)
+User -- (Coupon)
 
-
+(Coupon) <.down.(point):<<extend>>
 (watch_menu)<.down.(find_menu):<<extend>>
 (watch_menu)<.down.(Show_detail_menu):<<extend>>
 (Show_detail_menu)<.down.(add_cart):<<extend>>
