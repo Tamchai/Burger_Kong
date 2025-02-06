@@ -1,8 +1,8 @@
 classDiagram
     class System{
-        -list Member_List
-        -list Admin_List
-        -list Menu_List
+        -list user_List
+        -list menu_List
+        -instance Payment_method
         +search_menu()
         +login()
         +register()
@@ -13,7 +13,7 @@ classDiagram
         -str status
         -instance Member
         -float total_price
-        -instance Cart
+        -instance Cart_Item
         -instance Payment
         +addItem()
         +removeItem()
@@ -36,7 +36,7 @@ classDiagram
     }
     class Beverage{
         -str size
-        +setSize(str size)
+        +setsize(str size)
     }
     class Burger{
         -str addon
@@ -46,7 +46,7 @@ classDiagram
         -
     }
     class Cart{
-       -list item_list[] : instance Menu
+        -list item_list[] : instance Menu
         +addItem()
         +removeItem()
         +getTotal()
@@ -61,10 +61,10 @@ classDiagram
     class Admin{
         -str type
         +manageMenu()
-        +viewOrders()
+        +vieworders()
     }
     class Member{
-        -list Order_lst
+        -list order_lst
         -instance Address
         -instance Payment
         -int point
@@ -82,47 +82,55 @@ classDiagram
     class Payment{
         -ste payment_id
         -str date
-        -str total_price
+        -float total_price
         -str status
         -int discount
-        +processPayment()
+        -instance Payment_method
         +refundPayment()
     }
     class Payment_method{
         -str payment_method_id
         -str payment_method_name
-        +processPayment() 
+        +processpayment() 
     }
 
     class QRCode{
         -str qrCodeData
-        +processPayment()
+        +processpayment()
     }
     class Creditcard{
         -str cardNumber
         -str expiryDate
         -str cvv
-        +processPayment()
+        +processpayment()
     }
     class Coupon{
         -str code
         -float discount
+        -str expire_date
     }
-    Coupon <-- Payment
-    Payment *-- Payment_method
+    class Cart_Item{
+        -instance Menu
+        -int amount
+    }
+    
+    User <|-- Member
+    Coupon <-- Member
+    Payment --> Payment_method
     Payment_method <|-- QRCode
     Payment_method <|-- Creditcard
-    User <|-- Member
     User <|-- Admin  
     Menu <|-- Snack
     Menu <|-- Menu_set
     Menu <|-- Beverage
     Menu <|-- Burger
+    Member --> Cart
     Member --> Address
     Order --> Payment
-    Order --> Cart
     Order <-- Member
-    Cart --> Menu 
-    System o-- Member
-    System o-- Admin
+    Cart --> Cart_Item
+    Cart_Item --> Menu 
+    System --> Payment_method
+    Order --> Cart_Item
+    System o-- User
     System o-- Menu
