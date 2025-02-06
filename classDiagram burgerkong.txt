@@ -1,4 +1,12 @@
 classDiagram
+    class System{
+        -list Member_List
+        -list Admin_List
+        -list Menu_List
+        +search_menu()
+        +login()
+        +register()
+    }
 
     class Order{
         -str order_id
@@ -21,7 +29,7 @@ classDiagram
         +getDetails()
     }
     class Menu_set{
-        -list menu_set_list[]
+        -list menu_set_list[] 
         +addMenuItem()
         +removeMenuItem()
         +getTotalPrice()
@@ -37,16 +45,8 @@ classDiagram
     class Snack{
         -
     }
-    class Payment{
-        -ste payment_id
-        -str date
-        -str amount
-        -str status
-        +processPayment()
-        +refundPayment()
-    }
     class Cart{
-       -list item_list[]
+       -list item_list[] : instance Menu
         +addItem()
         +removeItem()
         +getTotal()
@@ -55,7 +55,6 @@ classDiagram
         -str name
         -str tel
         -str password
-        +login()
         +logout()
         +updateProfile()
     }
@@ -65,10 +64,13 @@ classDiagram
         +viewOrders()
     }
     class Member{
-        -instance History
+        -list Order_lst
         -instance Address
         -instance Payment
+        -int point
+        -list coupon_lst : instance Coupon
         +placeOrder()
+        +exchange_point_to_counpon()
         +viewOrderHistory()
         +updateAddress()
     }
@@ -77,24 +79,50 @@ classDiagram
         -str detail
         +updateAddress()
     }
-    class History{
-        -str order_id
-        +viewOrderHistory()
+    class Payment{
+        -ste payment_id
+        -str date
+        -str total_price
+        -str status
+        -int discount
+        +processPayment()
+        +refundPayment()
+    }
+    class Payment_method{
+        -str payment_method_id
+        -str payment_method_name
+        +processPayment() 
     }
 
+    class QRCode{
+        -str qrCodeData
+        +processPayment()
+    }
+    class Creditcard{
+        -str cardNumber
+        -str expiryDate
+        -str cvv
+        +processPayment()
+    }
+    class Coupon{
+        -str code
+        -float discount
+    }
+    Coupon <-- Payment
+    Payment *-- Payment_method
+    Payment_method <|-- QRCode
+    Payment_method <|-- Creditcard
     User <|-- Member
     User <|-- Admin  
     Menu <|-- Snack
     Menu <|-- Menu_set
     Menu <|-- Beverage
     Menu <|-- Burger
-
-    Member --> History
-    Member --> Payment
     Member --> Address
-
     Order --> Payment
     Order --> Cart
-    Order --> Member
-
+    Order <-- Member
     Cart --> Menu 
+    System o-- Member
+    System o-- Admin
+    System o-- Menu
