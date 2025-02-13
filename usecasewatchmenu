@@ -1,4 +1,5 @@
 class System:
+    
     def __init__(self):
         self.__user_list = []
         self.__menu_list = []
@@ -12,9 +13,13 @@ class System:
             if menu_id == menus.get_id():
                 return menus
         pass
-    def search_menu(self):
-        pass
-    
+    def search_menu(self,menu_name):
+        search_list = []
+        for menus in self.__menu_list:
+            if menu_name in menus.get_name():
+                search_list.append(menus)
+        return [menu.get_details() for menu in search_list]
+
     def login(self):
         pass
     
@@ -86,6 +91,8 @@ class Menu:
         return self.__menu_id
     def get_details(self):
         return [self.__name,self.__price,self.__detail]
+    def get_name(self):
+        return self.__name
 
 class Snack(Menu):
     pass
@@ -285,7 +292,7 @@ def create_mockup_instances():
     member.add_to_cart(selectedmenu,10)
     print(member.get_cart())
     
-    
+    print(system.search_menu("B"))
     return {
         "system": system,
         "admin": admin,
