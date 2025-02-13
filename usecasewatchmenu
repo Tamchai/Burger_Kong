@@ -41,7 +41,16 @@ class Member(User):
         self.__payment = None
         self.__point = 0
         self.__coupon_list = []
-    
+        self.__cart = Cart()
+    def get_cart(self):
+        return self.__cart
+    def set_cart(self, cart):
+        self.__cart = cart
+        
+    def add_to_cart(self, menu, quantity):
+        if quantity <= 0:
+            return "Error: Quantity must be a positive number."
+        self.__cart.add_item(menu, quantity)
     def place_order(self):
         pass
     
@@ -117,8 +126,18 @@ class Cart:
     def __init__(self):
         self.__item_list = []
     
-    def add_item(self):
-        pass
+    def add_item(self, menu, quantity):
+        for item in self.__item_list:
+            if item.get_menu() == menu:
+                item.update_quantity(quantity)  # Update quantity if item exists
+                return
+        new_item = CartItem(menu, quantity)
+        self.__item_list.append(new_item)  # Add new item to cart
+    
+    def __str__(self):
+        return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
+    
+    
     
     def remove_item(self):
         pass
@@ -130,6 +149,20 @@ class CartItem:
     def __init__(self, menu, amount):
         self.__menu = menu
         self.__amount = amount
+    def get_menu(self):
+        return self.__menu
+    
+    def __str__(self):
+        return f"{self.__menu.get_details()[0]} x {self.__amount} (${self.__menu.get_details()[1]} each)"
+
+    def get_quantity(self):
+        return self.__amount
+
+    def update_quantity(self, quantity):
+        """Updates the quantity of the cart item."""
+        self.__amount += quantity
+
+    
 
 class Order:
     def __init__(self, order_id, member):
@@ -198,59 +231,61 @@ class Coupon:
         self.__discount = discount
         self.__expire_date = expire_date
 def create_mockup_instances():
-    # Create system instance
     system = System()
     
     # Create admin and member users
     admin = Admin("Admin User", "123456789", "adminpass", "SuperAdmin")
     member = Member("John Doe", "987654321", "memberpass")
     
-    # Add users to system
     system._System__user_list = [admin, member]
     
-    # Create address instance
+    # Assign an address to the member
     address = Address("John's Home", "123 Street, City, Country")
     member.update_address = address
     
     # Create menu items
     burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger", "Extra Cheese")
-    burger1 = Burger("Fast Food", 5, "Double Cheese Burger", 10.00, "Double Delicious cheeseburger", "Triple Extra Cheese")
-    
     drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium")
     snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden")
     
-    # Create menu set
     menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink")
     menu_set.add_menu_item = [burger, drink, snack]
     
-    # Add menu items to system
-    system._System__menu_list = [burger,burger1, drink, snack, menu_set]
-    # Create cart and add items
-    cart = Cart()
-    cart_item1 = CartItem(burger, 2)
-    cart_item2 = CartItem(drink, 1)
-    cart_item3 = CartItem(snack, 1)
-    cart.add_item = [cart_item1, cart_item2, cart_item3]
-    
-    # Create order
-    order = Order(1001, member)
-    order.add_item = [cart_item1, cart_item2, cart_item3]
-    order.calculate_total = 15.96
-    
-    # Create payment methods
-    qr_payment = QRCode("QR_DATA_12345")
-    credit_payment = CreditCard("1234567890123456", "12/25", "123")
-    
-    # Create payment
-    payment = Payment(5001, "2025-02-13", order.calculate_total, "Completed", 2.0, qr_payment)
-    
-    # Create coupon
-    coupon = Coupon("SAVE10", 10, "2025-12-31")
-    member.exchange_point_to_coupon = [coupon]
-    
+    system._System__menu_list = [burger, drink, snack, menu_set]
+
+    # Use the member's own cart
+    cart = member.get_cart()
+    # cart_item1 = CartItem(burger, 2)
+    # cart_item2 = CartItem(drink, 1)
+    # cart_item3 = CartItem(snack, 1)
+    # cart.add_item(cart_item1.get_menu(), cart_item1.get_quantity())
+    # cart.add_item(cart_item2.get_menu(), cart_item2.get_quantity())
+    # cart.add_item(cart_item3.get_menu(), cart_item3.get_quantity())
+
+
+    # Create order linked to the member
+    # order = Order(1001, member)
+    # order.add_item = [cart_item1, cart_item2, cart_item3]
+    # order.calculate_total = 15.96
+
+    # qr_payment = QRCode("QR_DATA_12345")
+    # credit_payment = CreditCard("1234567890123456", "12/25", "123")
+
+    # payment = Payment(5001, "2025-02-13", order.calculate_total, "Completed", 2.0, qr_payment)
+
+    # coupon = Coupon("SAVE10", 10, "2025-12-31")
+    # member.exchange_point_to_coupon = [coupon]
+
     print(system.display_menu())
-    selectedmenu = system.select_menu(1)
+    selectedmenu = system.select_menu(2)
     print(selectedmenu.get_details())
+    member.set_cart(cart)
+    member.add_to_cart(selectedmenu,2)
+    selectedmenu = system.select_menu(4)
+    member.add_to_cart(selectedmenu,10)
+    print(member.get_cart())
+    
+    
     return {
         "system": system,
         "admin": admin,
@@ -259,12 +294,13 @@ def create_mockup_instances():
         "menu_items": [burger, drink, snack],
         "menu_set": menu_set,
         "cart": cart,
-        "order": order,
-        "payment_methods": [qr_payment, credit_payment],
-        "payment": payment,
-        "coupon": coupon,
+        # "order": order,
+        # "payment_methods": [qr_payment, credit_payment],
+        # "payment": payment,
+        # "coupon": coupon,
     }
 
 # Example usage
 mockup_data = create_mockup_instances()
+
 
