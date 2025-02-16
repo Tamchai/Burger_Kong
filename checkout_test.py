@@ -21,6 +21,12 @@ class System:
     def register(self):
         pass
 
+    def search_user_by_id(self, user_id):
+        for user in self.__user_list:
+            if user.get_id() == user_id:
+                return user
+        return None
+    
 class User:
     def __init__(self, name, tel, password):
         self.__name = name
@@ -159,10 +165,14 @@ class Cart:
         new_item = CartItem(menu, quantity)
         self.__item_list.append(new_item)  # Add new item to cart
     
+    def get_item(self):
+        return [item.get_detail_item() for item in self.__item_list]
+    
+    def validate_cart(self):
+        return len(self.__item_list) > 0
+
     def __str__(self):
         return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
-    
-    
     
     def remove_item(self,menu):
         for item in self.__item_list:
@@ -186,6 +196,13 @@ class CartItem:
     def get_menu(self):
         return self.__menu
     
+    def get_detail_item(self):
+        return {
+            'name': self.__menu_item.get_name(),
+            'price': self.__menu_item.get_price(),
+            'quantity': self.__quantity
+        }
+
     def __str__(self):
         return f"{self.__menu.get_details()[0]} x {self.__amount} (${self.__menu.get_details()[1]} each)"
 
@@ -196,29 +213,30 @@ class CartItem:
         """Updates the quantity of the cart item."""
         self.__amount += quantity
 
-    
-
 class Order:
-    def __init__(self, order_id, member):
-        self.__order_id = order_id
+    def __init__(self, user_id, cart):
+        self.__user_id = user_id
+        self.__cart = cart
+        self.__total = 0
         self.__status = "Waiting"
-        self.__member = member
-        self.__total_price = 0.0
-        self.__cart_items = []
-        self.__payment = None
-    
-    def add_item(self,cart):
-        self.__cart_items = cart.get_items()
-    
-    def remove_item(self):
-        pass
     
     def calculate_total(self):
-        self.__total_price = sum(item.get_quantity() * item.get_menu().get_details()[1] for item in self.__cart_items)
-        return self.__total_price
+        for item in self.__cart.get_item():
+            self.__total += item['price'] * item['quantity']
+        return self.__total
     
-    def checkout(self):
+    def get_status(self):
         return self.__status
+    
+    @staticmethod
+    def process_order(user):
+        cart = user.get_cart()
+        if cart.validate_cart():
+            order = Order(user.get_id(), cart)
+            total = order.calculate_total()
+            return f"Order placed successfully! Total: ${total:.2f}", order
+        else:
+            return "Error: Cart is empty or invalid", None
 
 class Address:
     def __init__(self, name, detail):
@@ -266,6 +284,7 @@ class Coupon:
         self.__code = code
         self.__discount = discount
         self.__expire_date = expire_date
+
 def create_mockup_instances():
     system = System()
     
@@ -313,4 +332,3 @@ def create_mockup_instances():
 
 # Example usage
 mockup_data = create_mockup_instances()
-
