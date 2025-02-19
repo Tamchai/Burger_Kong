@@ -1,0 +1,22 @@
+sequenceDiagram
+    Actor User
+    participant UI
+    participant System
+    participant Menu
+    participant Cart
+    participant CartItem
+
+    User ->> UI : Choose Menu
+    UI ->> System : Select Menu(menu_id)
+    System ->> System : Search_by_id(menu_id)
+    System ->> Menu : get_menu_detail(menu_id)
+    Menu ->> System : return detail
+    System ->> UI : display detail
+
+    User ->> UI : Add to cart btn
+    UI ->> System : add_to_cart(menu_id, qty)
+    System ->> Cart : add_item(menu_id, qty)
+    Cart ->> CartItem : create_instance(menu_id, qty)
+    CartItem ->> Cart : return success
+    Cart ->> System : return success
+    System ->> UI : display success message
