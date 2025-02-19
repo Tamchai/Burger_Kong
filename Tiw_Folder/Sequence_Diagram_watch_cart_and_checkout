@@ -1,0 +1,35 @@
+sequenceDiagram
+    actor Member
+    participant UI
+    participant System
+    participant User
+    participant Cart
+    participant CartItem
+    participant Order
+
+    Member ->>+ UI: Open website
+    loop Search for id user in user_list
+        UI ->>+ System: search_user_by_id(user_id)
+        System ->>+ User: search_user_by_id(user_id)
+        User ->>+ Cart: get_item()
+        Cart ->>+ CartItem: get_detail_item()
+        CartItem -->>- Cart: return_detail_item()
+        Cart -->>- System: return_item[]
+        System -->>- UI: return_item[]
+    end
+    UI -->>- Member: display item[]
+
+    Member ->>+ UI: place_order()
+    UI ->>+ System: process_order(user_id)
+    System ->>+ Cart: validate_cart(user_id)
+    Cart -->> System: return cart_status
+    alt cart valid
+        System ->>+ Order: create_order(user_id)
+        Order ->> Order: calculate_total()
+        Order -->> System: return total
+        System ->> UI: display_order_summary(total)
+    else cart invalid
+        System ->> UI: show_error("Cart is empty or invalid")
+    end
+    UI -->>- Member: display result
+    System -->>- UI: finalize_order()
