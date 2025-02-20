@@ -38,7 +38,7 @@ def get():
             ),
             style="display: flex; justify-content: space-between; background: #f5ebdc; padding: 15px; border-radius: 30px; width: 60%; margin: auto;margin-top: 20px; border: 1px solid #502314;"
         ),
-         style="background: #f5ebdc;"
+         style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
     )
 )
 
