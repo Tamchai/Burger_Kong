@@ -3,6 +3,7 @@ classDiagram
         -list user_List
         -list menu_List
         -instance Payment_method
+        +search_user_bt_id()
         +search_menu()
         +login()
         +register()
