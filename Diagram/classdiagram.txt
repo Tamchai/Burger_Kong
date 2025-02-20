@@ -1,0 +1,136 @@
+classDiagram
+    class System{
+        -list user_List
+        -list menu_List
+        -instance Payment_method
+        +search_menu()
+        +login()
+        +register()
+    }
+
+    class Order{
+        -str order_id
+        -str status
+        -instance Member
+        -float total_price
+        -instance Cart_Item
+        -instance Payment
+        +addItem()
+        +removeItem()
+        +calculateTotal()
+        +checkout()
+    }
+    class Menu{
+        -str category
+        -str menu_id
+        -str name
+        -float price
+        -str detail
+        +getDetails()
+    }
+    class Menu_set{
+        -list menu_set_list[] 
+        +addMenuItem()
+        +removeMenuItem()
+        +getTotalPrice()
+    }
+    class Beverage{
+        -str size
+        +setsize(str size)
+    }
+    class Burger{
+        -str addon
+        +addAddon(str addon)
+    }
+    class Snack{
+        -
+    }
+    class Cart{
+        -list item_list[] : instance Menu
+        +addItem()
+        +removeItem()
+        +getTotal()
+    }
+    class User{
+        -str name
+        -str tel
+        -str password
+        +logout()
+        +updateProfile()
+    }
+    class Admin{
+        -str type
+        +manageMenu()
+        +vieworders()
+    }
+    class Member{
+        -list order_lst
+        -instance Address
+        -instance Payment
+        -int point
+        -list coupon_lst : instance Coupon
+        +placeOrder()
+        +exchange_point_to_counpon()
+        +viewOrderHistory()
+        +updateAddress()
+    }
+    class Address{
+        -str name
+        -str detail
+        +updateAddress()
+    }
+    class Payment{
+        -ste payment_id
+        -str date
+        -float total_price
+        -str status
+        -int discount
+        -instance Payment_method
+        +refundPayment()
+    }
+    class Payment_method{
+        -str payment_method_id
+        -str payment_method_name
+        +processpayment() 
+    }
+
+    class QRCode{
+        -str qrCodeData
+        +processpayment()
+    }
+    class Creditcard{
+        -str cardNumber
+        -str expiryDate
+        -str cvv
+        +processpayment()
+    }
+    class Coupon{
+        -str code
+        -float discount
+        -str expire_date
+    }
+    class Cart_Item{
+        -instance Menu
+        -int amount
+    }
+    
+    User <|-- Member
+    Coupon <-- Member
+    Payment --> Payment_method
+    Payment_method <|-- QRCode
+    Payment_method <|-- Creditcard
+    User <|-- Admin  
+    Menu <|-- Snack
+    Menu <|-- Menu_set
+    Menu <|-- Beverage
+    Menu <|-- Burger
+    Member --> Cart
+    Member --> Address
+    Order --> Payment
+    Order <-- Member
+    Cart --> Cart_Item
+    Cart_Item --> Menu 
+    System --> Payment_method
+    Order --> Cart_Item
+    System o-- User
+    System o-- Menu
