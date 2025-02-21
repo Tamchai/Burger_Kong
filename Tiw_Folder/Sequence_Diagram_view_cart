@@ -1,0 +1,21 @@
+sequenceDiagram
+    actor Member
+    participant UI
+    participant System
+    participant User
+    participant Cart
+    participant CartItem
+
+    Member ->>+ UI: View Cart
+    UI ->>+ System: send user_id
+    System ->>+ User: search_user_by_id(user_id)
+    User ->> User: for users in self.__user_list
+    User -->>- System: return member   
+    System ->>+ Cart: get_item_list(user_id)
+    Cart ->>+ CartItem: get_detail_item()
+    CartItem -->>- Cart: return detail_item
+    Cart->>Cart: calculate_total()
+    Cart -->>- System: return Cart_detail
+    
+    System -->>- UI: return Cart_detai
+    UI -->>- Member: display Cart detail    
