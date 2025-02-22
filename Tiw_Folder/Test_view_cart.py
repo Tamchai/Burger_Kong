@@ -6,41 +6,69 @@ class System:
     
     def display_menu(self):
         return [f"{menu_item.__class__.__name__}: {menu_item._Menu__name} - ${menu_item._Menu__price}" for menu_item in self.__menu_list]
-    
-    def select_menu(self, menu_id):
-        for menu in self.__menu_list:
-            if menu_id == menu.get_id():
-                return menu
-        return None
 
+    def select_menu(self,menu_id):
+        for menus in self.__menu_list:
+            if menu_id == menus.get_id():
+                return menus.get_details()
             
-    def search_menu(self,menu_id):
-        pass
+    def select_menu(self,menu_id):
+        menu = self.search_menu_by_id(menu_id)
+        return menu
+    
+    def search_menu_by_id(self,menu_id):
+        for menus in self.__menu_list:
+            if menu_id == menus.get_id():
+                return menus
+
+    def search_user_by_id(self,user_id):
+        for users in self.__user_list:
+            if users.get_id() == user_id:
+                return users
             
-    def add_to_cart(self, member, menu_item, quantity):
+    def add_to_cart(self, user_id, menu_item, quantity, addons=None):
+        member = self.search_user_by_id(user_id)
         if not menu_item:
             return "Error: Menu item not found."
         if quantity <= 0:
             return "Error: Quantity must be a positive number."
-        return member.add_to_cart(menu_item, quantity)
-        
+
+        total_price = menu_item.get_price() * quantity
+
+        if isinstance(addons, str):  
+            addons = [addons]
+        elif addons is None or not isinstance(addons, (list, tuple)):  
+            addons = []
+        if isinstance(menu_item, Burger) and addons:
+            for addon in addons:
+                if addon in menu_item.get_addons():
+                    total_price += menu_item.get_addons()[addon] * quantity 
+
+        return member.add_to_cart(menu_item, quantity, addons)
+
+    def view_cart(self,user_id):
+        member = self.search_user_by_id(user_id)
+        if not member:
+            return "Error: User not found"
+        cart = member.get_cart()
+        cart_details = cart.get_cart_details()
+        return cart_details
+
     def login(self):
         pass
     
     def register(self):
         pass
-    
-    def search_user_by_id(self, user_id):
-        for user in self.__user_list:
-            if user.get_id() == user_id:
-                return user
-        return None
 
 class User:
-    def __init__(self, name, tel, password):
+    def __init__(self,user_id, name, tel, password):
+        self.__user_id = user_id
         self.__name = name
         self.__tel = tel
         self.__password = password
+
+    def get_id(self):
+        return self.__user_id 
     
     def logout(self):
         pass
@@ -49,8 +77,8 @@ class User:
         pass
 
 class Member(User):
-    def __init__(self, name, tel, password):
-        super().__init__(name, tel, password)
+    def __init__(self, user_id,name, tel, password):
+        super().__init__(user_id,name, tel, password)
         self.__order_list = []
         self.__address = None
         self.__payment = None
@@ -60,38 +88,26 @@ class Member(User):
 
     def get_cart(self):
         return self.__cart
-    
     def set_cart(self, cart):
         self.__cart = cart
         
-    def add_to_cart(self, menu, quantity):
+    def add_to_cart(self, menu, quantity, addons=None):
         if quantity <= 0:
             return "Error: Quantity must be a positive number."
-        self.__cart.add_item(menu, quantity)
+        
+        total_price = menu.get_price() * quantity
+
+        if isinstance(menu, Burger) and addons:
+            for addon in addons:
+                if addon in menu.get_addons():
+                    total_price += menu.get_addons()[addon] * quantity  
+
+        self.__cart.add_item(menu, quantity, total_price)
+        
         return "Success"
     
-
     def place_order(self):
-        if not self.__cart.get_total():
-            return "Error: Cart is empty!"
-
-        total_price = self.__cart.get_total()
-        print(f"Total price of cart items: ${total_price}")
-        if self.__payment:
-            payment_status = self.__payment.process_payment(total_price)
-            if payment_status == "Success":
-                order = Order(1001, self)
-                order.add_item(self.__cart)
-                order.calculate_total()
-                self.__order_list.append(order)
-                
-                self.__cart.empty_cart()
-                
-                return "Order placed successfully!"
-            else:
-                return f"Payment failed: {payment_status}"
-        else:
-            return "Error: Payment method not set."
+        pass
     
     def exchange_point_to_coupon(self):
         pass
@@ -99,12 +115,12 @@ class Member(User):
     def view_order_history(self):
         pass
     
-    def update_address(self,address):
-        self.__address = address
+    def update_address(self):
+        pass
 
 class Admin(User):
-    def __init__(self, name, tel, password, admin_type):
-        super().__init__(name, tel, password)
+    def __init__(self, user_id,name, tel, password,admin_type):
+        super().__init__(user_id,name, tel, password)
         self.__type = admin_type
     
     def manage_menu(self):
@@ -123,19 +139,20 @@ class Menu:
     
     def get_id(self):
         return self.__menu_id
-    
+
     def get_details(self):
-        return self
-    
+        return self.__detail
+
     def get_name(self):
         return self.__name
-    
+
     def get_price(self):
         return self.__price
-    
+
     def __str__(self):
         return self.__name
-    
+
+
 class Snack(Menu):
     pass
 
@@ -162,52 +179,62 @@ class Beverage(Menu):
         self.__size = size
 
 class Burger(Menu):
-    def __init__(self, category, menu_id, name, price, detail, addon):
+    def __init__(self, category, menu_id, name, price, detail):
         super().__init__(category, menu_id, name, price, detail)
-        self.__addon = addon
+        self.__addons = {}
     
-    def add_addon(self, addon):
-        self.__addon = addon
-   
+    def add_addon(self, addon, price):
+        self.__addons[addon] = price
+
+    def get_addons(self):
+        return self.__addons
+
+    def calculate_total_price(self):
+        return self.get_price() + sum(self.__addons.values())
+
+    def __str__(self):
+        addons_str = ", ".join([f"{addon} (+${price})" for addon, price in self.__addons.items()])
+        return f"{self.get_name()} - ${self.get_price()} ({addons_str})" if addons_str else f"{self.get_name()} - ${self.get_price()}"
+
 class Cart:
     def __init__(self):
         self.__item_list = []
     
-    def add_item(self, menu, quantity):
+    def add_item(self, menu, quantity,total_price):
         for item in self.__item_list:
             if item.get_menu() == menu:
                 item.update_quantity(quantity)
                 return "Item quantity updated in cart."
-        new_item = CartItem(menu, quantity)
+        new_item = CartItem(menu, quantity,total_price)
         self.__item_list.append(new_item)
         return "Item added to cart."
 
     def get_item_list(self):
         return self.__item_list
     
-    def validate_cart(self):
-        return len(self.__item_list) > 0
-    
+    def get_cart_details(self):
+        if not self.__item_list:
+            return "Cart is empty"
+        
+        details = [str(item) for item in self.__item_list]
+        total_price = sum(item.get_total_price() for item in self.__item_list)
+        details.append(f"Total Price: ${total_price:.2f}")
+        return "\n".join(details)
+
     def __str__(self):
         return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
     
-    def remove_item(self,menu):
-        for item in self.__item_list:
-            if item.get_menu() == menu:
-                self.__item_list.remove(item)
-                break
+    def remove_item(self):
+        pass
     
     def get_total(self):
-        total = 0
-        for item in self.__item_list:
-            total += item.get_quantity() * item.get_menu().get_price()
-        return round(total, 2)
+        pass
 
 class CartItem:
-    def __init__(self, menu, amount):
+    def __init__(self, menu, amount,total_price):
         self.__menu = menu
         self.__amount = amount
-
+        self.__total_price = total_price
     def get_menu(self):
         return self.__menu
     
@@ -215,23 +242,26 @@ class CartItem:
         self.__menu = menu
         self.__amount = amount
 
-    def get_detail_item(self):
-        return {
-            'name': self.__menu.get_name(),
-            'price': self.__menu.get_price(),
-            'quantity': self.__amount
-        }
-
-    
     def __str__(self):
-        return f"{self.__menu.get_name()} x {self.__amount} (${self.__menu.get_price()} each)"
-    
+     return f"{self.__menu.get_name()} x {self.__amount} - Total: ${self.__total_price:.2f}"
+
     def get_quantity(self):
         return self.__amount
+
+    def get_total_price(self):
+        return self.__total_price
 
     def update_quantity(self, quantity):
         """Updates the quantity of the cart item."""
         self.__amount += quantity
+
+class Addres:
+    def __init__(self, name, detail):
+        self.__name = name
+        self.__detail = detail
+    
+    def update_address(self):
+        pass
 
 class Order:
     def __init__(self, order_id, member):
@@ -249,39 +279,11 @@ class Order:
         pass
     
     def calculate_total(self):
-        self.__total_price = sum(item.get_quantity() * item.get_menu().get_price() for item in self.__cart_items)
-        return self.__total_price
-
-    
-    def get_status(self):
-        return self.__status
-    
-    @staticmethod
-    def process_order(user):
-        cart = user.get_cart()
-        if cart.validate_cart():
-            order = Order(1001, user)
-            for item in cart.get_item_list():
-                order.__cart_items.append(item)
-            total = order.calculate_total()
-            return f"Order placed successfully! Total: ${total:.2f}", order
-        else:
-            return "Error: Cart is empty or invalid", None
-
+        pass
     
     def checkout(self):
         pass
 
-class Address:
-    def __init__(self, name, detail):
-        self.__name = name
-        self.__detail = detail
-    
-    def update_address(self):
-        pass
-
-    def get_details(self):
-        return f"{self.__name}: {self.__detail}"
 
 class Payment:
     def __init__(self, payment_id, date, total_price, status, discount, payment_method):
@@ -302,7 +304,7 @@ class PaymentMethod:
     
     def process_payment(self):
         pass
-
+    
 class QRCode(PaymentMethod):
     def __init__(self, qr_code_data):
         super().__init__()
@@ -325,56 +327,59 @@ def create_mockup_instances():
     system = System()
     
     # Create admin and member users
-    admin = Admin("Admin User", "123456789", "adminpass", "SuperAdmin")
-    member = Member("John Doe", "987654321", "memberpass")
+    admin = Admin(1,"Admin User", "123456789", "adminpass", "SuperAdmin")
+    member = Member(2,"John Doe", "987654321", "memberpass")
     
     system._System__user_list = [admin, member]
     
     # Assign an address to the member
     address = Address("John's Home", "123 Street, City, Country")
-    member.update_address(address)
+    member.update_address = address
     
     # Create menu items
-    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger", "Extra Cheese")
+    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger")
     drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium")
     snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden")
     
     menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink")
     menu_set.add_menu_item = [burger, drink, snack]
-    
+    burger.add_addon("More Patty",1)
+    burger.add_addon("Bacon",0.75)
+    burger.add_addon("More Cheese",0.5)
     system._System__menu_list = [burger, drink, snack, menu_set]
-
     cart = member.get_cart()
-    cart.add_item(burger, 1)
-    cart.add_item(drink, 2)
-    cart.add_item(snack, 2)
-   
-    return {
-        "system": system,
-        "admin": admin,
-        "member": member,
-        "address": address,
-        "menu_items": [burger, drink, snack],
-        "menu_set": menu_set,
-        "cart": cart,
-        
-    }
+    return system,member
+
+system,member = create_mockup_instances()
 
 # Example usage
-def watch_cart_and_checkout(system, member):
-    print("Cart Contents:")
-    print(member.get_cart())
-
-    print("\nAttempting to checkout...")
-    result = member.place_order()
-    print(f"Checkout result: {result}")
-
-    if "Order placed successfully!" in result:
-        print("\nOrder was successful!")
+def test_view_cart(system, member):
+    print("Displaying menu:")
+    for item in system.display_menu():
+        print(item)
+    
+    member_id = member.get_id()
+    print("\nSelecting and adding menu items to cart:")
+    selected_menu = system.search_menu_by_id(1)
+    if selected_menu:
+        print(f"Selected menu: {selected_menu.get_name()}")
+        result = system.add_to_cart(member_id, selected_menu, 2, ["Bacon"])
+        print(f"Add to cart result: {result}")
     else:
-        print("\nOrder failed. Please check the issue.")
+        print("Error: Burger not found.")
+    
+    print("Cart contents:")
+    print(system.view_cart(member_id))
+    
+    selected_menu = system.search_menu_by_id(2)
+    if selected_menu:
+        print(f"Selected menu: {selected_menu.get_name()}")
+        result = system.add_to_cart(member_id, selected_menu, 2)
+        print(f"Add to cart result: {result}")
+    else:
+        print("Error: Beverage not found.")
+    
+    print("\nUpdated cart contents:")
+    print(system.view_cart(member_id))
 
-# Example usage with mockup data
-mockup_data = create_mockup_instances()
-
-watch_cart_and_checkout(mockup_data["system"], mockup_data["member"])
+test_view_cart(system,member)
