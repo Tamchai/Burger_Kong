@@ -243,7 +243,7 @@ class Cart:
     def update_total(self):
         return H2(f"Total: ${self.calculate_total_price():.2f}", id="total", 
                 style="color: #D00000; font-weight: bold; margin-top: 10px;",
-                  hx_swap_oob="true")
+              hx_swap_oob="true")
 
     def __str__(self):
         return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
@@ -335,10 +335,56 @@ def product_card(p):
 
 @rt('/')
 def get():
-    return Container(Body(
-        H1("BurgerKong Cart", style="color: #502314; background: #f5ebdc; text-align: center; padding: 10px;"),
+    return Container(
         Div(
-            Div( #ใช้แค่ส่งไม่ได้เอาไปใช้จริง
+            Div(
+                Div(
+                    Button("☰", 
+                        style="""
+                            background: transparent; 
+                            border: none; 
+                            color: #502314;
+                            font-size: 24px;
+                            width: 40px; 
+                            height: 40px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0;
+                            padding: 0;
+                            cursor: pointer;
+                        """
+                    ),
+                    Img(src="https://drive.google.com/uc?export=view&id=1oFUpKF61JStRktpR705JfVOzyjhlFRsS", 
+                        style="width: 30px; height: auto; margin: 0 10px;"
+                    ),
+                    H2("Burger Kong", style="color: #502314; margin: 0;"),
+                    style="display: flex; align-items: center; gap: 10px;"
+                ),
+                Div(
+                    "user.png | notification.png | search.png | cart.png",
+                    style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
+                ),
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
+            ),
+            style="""
+                width: 100%; 
+                background: #f5ebdc; 
+                padding: 15px; 
+                border-bottom: 2px solid #502314;
+                position: fixed; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                z-index: 1000;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+            """
+        ),
+        Body(
+        H1("BurgerKong Cart", style="color: #502314; background: #f5ebdc; text-align: center; padding: 10px; padding-top: 70px;"),
+        Div(
+            #ใช้แค่ส่ง ไม่ได้เอาไปใช้จริง
+            Div(      
                 *[product_card(p) for p in products], 
                 id="product-list",
                 style="width: 30%; padding: 15px; display: flex; flex-direction: column; gap: 15px;"
@@ -371,8 +417,8 @@ def get():
         ),
 
         style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
-    ))
-
+    )
+)
 
 @rt('/cart/add/{id}')
 def post(id: int):
