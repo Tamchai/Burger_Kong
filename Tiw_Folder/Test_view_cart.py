@@ -1,3 +1,7 @@
+from fasthtml.common import *
+from dataclasses import dataclass
+
+app, rt = fast_app(live=True)
 class System:
     def __init__(self):
         self.__user_list = []
@@ -6,11 +10,6 @@ class System:
     
     def display_menu(self):
         return [f"{menu_item.__class__.__name__}: {menu_item._Menu__name} - ${menu_item._Menu__price}" for menu_item in self.__menu_list]
-
-    def select_menu(self,menu_id):
-        for menus in self.__menu_list:
-            if menu_id == menus.get_id():
-                return menus.get_details()
             
     def select_menu(self,menu_id):
         menu = self.search_menu_by_id(menu_id)
@@ -39,10 +38,11 @@ class System:
             addons = [addons]
         elif addons is None or not isinstance(addons, (list, tuple)):  
             addons = []
+
         if isinstance(menu_item, Burger) and addons:
             for addon in addons:
                 if addon in menu_item.get_addons():
-                    total_price += menu_item.get_addons()[addon] * quantity 
+                    total_price += menu_item.get_addons()[addon] * quantity
 
         return member.add_to_cart(menu_item, quantity, addons)
 
@@ -88,6 +88,7 @@ class Member(User):
 
     def get_cart(self):
         return self.__cart
+    
     def set_cart(self, cart):
         self.__cart = cart
         
@@ -200,33 +201,57 @@ class Cart:
     def __init__(self):
         self.__item_list = []
     
-    def add_item(self, menu, quantity,total_price):
+    def add_item(self, menu, quantity, total_price):
         for item in self.__item_list:
-            if item.get_menu() == menu:
-                item.update_quantity(quantity)
+            if item.get_menu().get_id() == menu.get_id():
+                item.update_quantity(quantity, total_price)
                 return "Item quantity updated in cart."
-        new_item = CartItem(menu, quantity,total_price)
+        
+        new_item = CartItem(menu, quantity, total_price)
         self.__item_list.append(new_item)
         return "Item added to cart."
 
     def get_item_list(self):
         return self.__item_list
     
+    def calculate_total_price(self):
+        return sum(item.get_total_price() for item in self.get_item_list())
+
     def get_cart_details(self):
-        if not self.__item_list:
+        if not self.get_item_list():
             return "Cart is empty"
         
-        details = [str(item) for item in self.__item_list]
-        total_price = sum(item.get_total_price() for item in self.__item_list)
-        details.append(f"Total Price: ${total_price:.2f}")
+        details = [str(item) for item in self.get_item_list()]
+        details.append(f"Total Price: ${self.calculate_total_price():.2f}")
         return "\n".join(details)
+    
+    def update_cart_items(self):
+        cart_items = self.get_item_list()
+        items_html = [
+            Div(
+                P(f"{item.get_menu().name} x {item.get_quantity()} - ${item.get_total_price():.2f}",
+                style="font-size: 20px; color: #502314; font-weight: bold;"),
+                Button("Remove", hx_post=f"/cart/remove/{item.get_menu().id}", hx_target="#cart-items", hx_swap="innerHTML",
+                    style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align:center;"),
+                style="display: flex; justify-content: space-between; align-items: center; padding: 5px;"
+            )
+            for item in cart_items
+        ]
+        return Div(*items_html, id="cart-items")
+
+
+    def update_total(self):
+        return H2(f"Total: ${self.calculate_total_price():.2f}", id="total", 
+                style="color: #D00000; font-weight: bold; margin-top: 10px;",
+                  hx_swap_oob="true")
 
     def __str__(self):
         return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
     
-    def remove_item(self):
-        pass
-    
+    def remove_item(self, menu_id):
+        self.__item_list = [item for item in self.__item_list if item.get_menu().get_id() != menu_id]
+
+
     def get_total(self):
         pass
 
@@ -235,6 +260,7 @@ class CartItem:
         self.__menu = menu
         self.__amount = amount
         self.__total_price = total_price
+        
     def get_menu(self):
         return self.__menu
     
@@ -242,18 +268,18 @@ class CartItem:
         self.__menu = menu
         self.__amount = amount
 
-    def __str__(self):
-     return f"{self.__menu.get_name()} x {self.__amount} - Total: ${self.__total_price:.2f}"
-
     def get_quantity(self):
         return self.__amount
 
     def get_total_price(self):
         return self.__total_price
 
-    def update_quantity(self, quantity):
-        """Updates the quantity of the cart item."""
+    def update_quantity(self, quantity, total_price):
         self.__amount += quantity
+        self.__total_price += total_price
+        
+    def __str__(self):
+        return f"{self.__menu.get_name()} x {self.__amount} - Total: ${self.__total_price:.2f}"
 
 class Addres:
     def __init__(self, name, detail):
@@ -263,40 +289,6 @@ class Addres:
     def update_address(self):
         pass
 
-class Order:
-    def __init__(self, order_id, member):
-        self.__order_id = order_id
-        self.__status = "Waiting"
-        self.__member = member
-        self.__total_price = 0.0
-        self.__cart_items = []
-        self.__payment = None
-    
-    def add_item(self):
-        pass
-    
-    def remove_item(self):
-        pass
-    
-    def calculate_total(self):
-        pass
-    
-    def checkout(self):
-        pass
-
-
-class Payment:
-    def __init__(self, payment_id, date, total_price, status, discount, payment_method):
-        self.__payment_id = payment_id
-        self.__date = date
-        self.__total_price = total_price
-        self.__status = status
-        self.__discount = discount
-        self.__payment_method = payment_method
-    
-    def refund_payment(self):
-        pass
-
 class PaymentMethod:
     def __init__(self, payment_method_id=None, payment_method_name=None):
         self.__payment_method_id = payment_method_id
@@ -304,82 +296,108 @@ class PaymentMethod:
     
     def process_payment(self):
         pass
-    
-class QRCode(PaymentMethod):
-    def __init__(self, qr_code_data):
-        super().__init__()
-        self.__qr_code_data = qr_code_data
 
-class CreditCard(PaymentMethod):
-    def __init__(self, card_number, expiry_date, cvv):
-        super().__init__()
-        self.__card_number = card_number
-        self.__expiry_date = expiry_date
-        self.__cvv = cvv
+@dataclass
+class Product:
+    def __init__(self, id, name, price):
+        self.id = id
+        self.name = name
+        self.price = price
 
-class Coupon:
-    def __init__(self, code, discount, expire_date):
-        self.__code = code
-        self.__discount = discount
-        self.__expire_date = expire_date
+    def get_id(self):
+        return self.id
 
-def create_mockup_instances():
-    system = System()
-    
-    # Create admin and member users
-    admin = Admin(1,"Admin User", "123456789", "adminpass", "SuperAdmin")
-    member = Member(2,"John Doe", "987654321", "memberpass")
-    
-    system._System__user_list = [admin, member]
-    
-    # Assign an address to the member
-    address = Address("John's Home", "123 Street, City, Country")
-    member.update_address = address
-    
-    # Create menu items
-    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger")
-    drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium")
-    snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden")
-    
-    menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink")
-    menu_set.add_menu_item = [burger, drink, snack]
-    burger.add_addon("More Patty",1)
-    burger.add_addon("Bacon",0.75)
-    burger.add_addon("More Cheese",0.5)
-    system._System__menu_list = [burger, drink, snack, menu_set]
-    cart = member.get_cart()
-    return system,member
+products = [
+    Product(1, "Cheese Burger", 5.99), 
+    Product(2, "Coke", 1.99), 
+    Product(3, "French Fries", 2.99),
+    Product(4, "Burger Combo", 9.99)
+]
 
-system,member = create_mockup_instances()
+cart = Cart()
 
-# Example usage
-def test_view_cart(system, member):
-    print("Displaying menu:")
-    for item in system.display_menu():
-        print(item)
-    
-    member_id = member.get_id()
-    print("\nSelecting and adding menu items to cart:")
-    selected_menu = system.search_menu_by_id(1)
-    if selected_menu:
-        print(f"Selected menu: {selected_menu.get_name()}")
-        result = system.add_to_cart(member_id, selected_menu, 2, ["Bacon"])
-        print(f"Add to cart result: {result}")
-    else:
-        print("Error: Burger not found.")
-    
-    print("Cart contents:")
-    print(system.view_cart(member_id))
-    
-    selected_menu = system.search_menu_by_id(2)
-    if selected_menu:
-        print(f"Selected menu: {selected_menu.get_name()}")
-        result = system.add_to_cart(member_id, selected_menu, 2)
-        print(f"Add to cart result: {result}")
-    else:
-        print("Error: Beverage not found.")
-    
-    print("\nUpdated cart contents:")
-    print(system.view_cart(member_id))
+def product_card(p):
+    return Card(
+        Div(
+            H3(p.name, style="color: #502314; font-size: 22px; font-weight: bold; text-align: center;"),
+            P(f"${p.price:.2f}", style="color: #D00000; font-size: 18px; text-align: center; font-weight: bold;"),
+            Button(
+                "Add to Cart", 
+                hx_post=f"/cart/add/{p.id}", 
+                hx_target="#cart-items",  
+                hx_swap="innerHTML",
+                style="background: #502314; color: white; padding: 10px 15px; border: none; border-radius: 15px; display: block; width: 100%; font-size: 16px; font-weight: bold;"
+            ),
+            style="padding: 15px; display: flex; flex-direction: column; align-items: center;"
+        ),
+        style="background: #f5ebdc; border-radius: 20px; padding: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); text-align: center; width: 200px;"
+    )
 
-test_view_cart(system,member)
+@rt('/')
+def get():
+    return Container(Body(
+        H1("BurgerKong Cart", style="color: #502314; background: #f5ebdc; text-align: center; padding: 10px;"),
+        Div(
+            Div( #ใช้แค่ส่งไม่ได้เอาไปใช้จริง
+                *[product_card(p) for p in products], 
+                id="product-list",
+                style="width: 30%; padding: 15px; display: flex; flex-direction: column; gap: 15px;"
+            ),
+            Div(
+                Div(
+                    Div(
+                        H2("Your Order", style="color: #502314;"),
+                        Button("Add more", style="background: #502314; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align: center;"),
+                        style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
+                    ),
+                    Div(id="cart-items", children=[],
+                        style="flex-grow: 1; width: 100%;"
+                    ),
+                    Div(
+                        H3("Discount:", style="color: #502314;"),
+                        H2("Total: $0.00", id="total", style="color: #D00000; font-weight: bold; margin-top: 10px;"),  
+                        Div(
+                            Button("Checkout", 
+                                style="font-size: 20px; font-weight: bold; background-color: #D00000; color: #ffffff; width: 50%; padding: 10px; border: none; display: block; margin: auto; border-radius: 10px;"),
+                            style="width: 100%; display: flex; justify-content: center; margin-top: 15px;"
+                        ),
+                        style="display: flex; flex-direction: column; width: 100%; padding-top: 15px; margin-top: auto;"
+                    ),
+                    style="display: flex; flex-direction: column; width: 100%; height: 100%; flex-grow: 1;"
+                ),
+                style="display: flex; flex-direction: column; background: #f5ebdc; padding: 20px; border-radius: 30px; width: 75%; height: 90vh; margin: auto; border: 1px solid #502314;"
+            ),
+            style="display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 20px; width: 80%;"
+        ),
+
+        style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+    ))
+
+
+@rt('/cart/add/{id}')
+def post(id: int):
+    product = next((p for p in products if p.id == id), None)
+    if not product:
+        return "Product not found"
+
+    cart.add_item(product, 1, product.price)
+
+    return Div(
+        cart.update_cart_items(),
+        cart.update_total() 
+    )
+
+@rt('/cart/remove/{id}')
+def remove_from_cart(id: int):
+    product = next((p for p in products if p.id == id), None)
+    if not product:
+        return "Product not found"
+
+    cart.remove_item(id)
+
+    return Div(
+        cart.update_cart_items(),
+        cart.update_total()
+    )
+ 
+serve()
