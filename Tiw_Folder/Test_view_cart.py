@@ -355,14 +355,21 @@ def get():
                             cursor: pointer;
                         """
                     ),
-                    Img(src="https://drive.google.com/uc?export=view&id=1oFUpKF61JStRktpR705JfVOzyjhlFRsS", 
-                        style="width: 30px; height: auto; margin: 0 10px;"
+                    Img(src="https://i.imgur.com/fCpADUO.png", 
+                        style="width: 55px; height: auto; margin: 0px;"
                     ),
                     H2("Burger Kong", style="color: #502314; margin: 0;"),
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
                 Div(
-                    "user.png | notification.png | search.png | cart.png",
+                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
+                        style="width: 40px; height: auto; margin-right: 15px;"),
+                    Img(src="https://i.imgur.com/AcIDazc.png",
+                        style="width: 40px; height: auto; margin-right: 15px;"),
+                    Img(src="https://i.imgur.com/Kj7efMN.png",
+                        style="width: 40px; height: auto; margin-right: 10px;"),
+                    Img(src="https://i.imgur.com/2eQjSEg.png",
+                        style="width: 40px; height: auto; margin-right: 20px;"),
                     style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
                 ),
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
