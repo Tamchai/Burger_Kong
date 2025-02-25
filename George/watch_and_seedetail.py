@@ -6,7 +6,14 @@ class System:
         self.__user_list = []
         self.__menu_list = []
         self.__payment_method = PaymentMethod()
-    
+
+    def search_products_by_name(self, search: str):
+        result = []
+        for i in self.get_menu_list():
+            if search.lower() in i.get_name().lower():
+                result.append(i)
+        return result
+
     def display_menu(self):
         return [f"{menu_item.__class__.__name__}: {menu_item._Menu__name} - ${menu_item._Menu__price}" for menu_item in self.__menu_list]
 
@@ -100,13 +107,17 @@ class Admin(User):
         pass
 
 class Menu:
-    def __init__(self, category, menu_id, name, price, detail):
+    def __init__(self, category, menu_id, name, price, detail, src):
         self.__category = category
         self.__menu_id = menu_id
         self.__name = name
         self.__price = price
         self.__detail = detail
+        self.__src = src
     
+    def get_src(self):
+        return self.__src
+
     def get_id(self):
         return self.__menu_id
 
@@ -126,8 +137,8 @@ class Snack(Menu):
     pass
 
 class MenuSet(Menu):
-    def __init__(self, category, menu_id, name, price, detail):
-        super().__init__(category, menu_id, name, price, detail)
+    def __init__(self, category, menu_id, name, price, detail, src):
+        super().__init__(category, menu_id, name, price, detail, src)
         self.__menu_set_list = []
     
     def add_menu_item(self):
@@ -140,16 +151,16 @@ class MenuSet(Menu):
         pass
 
 class Beverage(Menu):
-    def __init__(self, category, menu_id, name, price, detail, size):
-        super().__init__(category, menu_id, name, price, detail)
+    def __init__(self, category, menu_id, name, price, detail, size, src):
+        super().__init__(category, menu_id, name, price, detail, src)
         self.__size = size
     
     def set_size(self, size):
         self.__size = size
 
 class Burger(Menu):
-    def __init__(self, category, menu_id, name, price, detail, addon):
-        super().__init__(category, menu_id, name, price, detail)
+    def __init__(self, category, menu_id, name, price, detail, addon, src):
+        super().__init__(category, menu_id, name, price, detail, src)
         self.__addon = addon
     
     def add_addon(self, addon):
@@ -281,19 +292,17 @@ def create_mockup_instances():
     member.update_address = address
     
     # Create menu items
-    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger", "Extra Cheese")
-    drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium")
-    snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden")
-    burger2 = Burger("Fast Food", 5, "George Burger", 5.99, "Delicious cheeseburger", "Extra Cheese")
-    drink2 = Beverage("Beverage", 6, "Meen Burger", 1.99, "Refreshing drink", "Medium")
-    snack2 = Snack("Snacks", 7, "Tiw Fries", 2.99, "Crispy and golden")
-    snack3 = Snack("Snacks", 8, "Guide Fries", 2.99, "Crispy and golden")
-    snack4 = Snack("Snacks", 9, "Guide Fries", 2.99, "Crispy and golden")
-    snack5 = Snack("Snacks", 10, "Guide Fries", 2.99, "Crispy and golden")
-    menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink")
+    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger", "Extra Cheese", "/Burger_select.png")
+    drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium", "/Beverage_select.png")
+    snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden", "/snack_select.png")
+    burger2 = Burger("Fast Food", 5, "George Burger", 5.99, "Delicious cheeseburger", "Extra Cheese", "/Burger_select.png")
+    drink2 = Beverage("Beverage", 6, "Meen Burger", 1.99, "Refreshing drink", "Medium", "/Beverage_select.png")
+    snack2 = Snack("Snacks", 7, "Tiw Fries", 2.99, "Crispy and golden", "/snack_select.png")
+    snack3 = Snack("Snacks", 8, "Guide Fries", 2.99, "Crispy and golden", "/snack_select.png")
+    menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink", "/combo2.png")
     menu_set.add_menu_item = [burger, drink, snack]
     
-    system._System__menu_list = [burger, drink, snack, menu_set, burger2, drink2, snack2, snack3, snack4, snack5]
+    system._System__menu_list = [burger, drink, snack, menu_set, burger2, drink2, snack2, snack3]
 
     cart = member.get_cart()
     
@@ -335,9 +344,9 @@ pic = "/logo.png"
 def product_card(p): 
     menu_id = p.get_id()
     return Card(
-        H3(p.get_name(), style="text-align: center; margin: 10px 0;"),
-        Img(src=pic, alt="ภาพตัวอย่าง", style="width: 100px; height: 100px; display: block; margin: auto;"),
-        P(f"${p.get_price()}", style="text-align: center; font-weight: bold;"),
+        H3(p.get_name(), style="text-align: center; margin: 10px 0; color : #502314;"),
+        Img(src=p.get_src(), alt="ภาพตัวอย่าง", style="width: 100px; height: 100px; display: block; margin: auto;"),
+        P(f"${p.get_price()}", style="text-align: center; font-weight: bold; color : #502314;"),
         Form(
             Input(type="hidden", name = str(menu_id)),
             Button("SeeDetail", type="submit"),
@@ -360,13 +369,32 @@ def product_card(p):
     )
 
 
+@app.get('/search')
+def search(search: str):
+    results = system.search_products_by_name(search)
+    return H1(f"result : {search}", style="color : #502314;"),Grid(
+                *[product_card(p) for p in results],
+                id="product-list",
+                style="""
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 20px;
+                    justify-items: center;
+                    align-items: center;
+                    margin: 0 auto;
+                """
+            )
+
 @app.get("/")
 def home():
     return Title("Burger Kong"), Container(
-        Img(src=pic, alt="ภาพตัวอย่าง"), 
+        Img(src=pic, alt="ภาพตัวอย่าง",style="height : 200px; widght : 200px;"),
+        Form(Input(id="search", placeholder="Search products..."), 
+           hx_get="/search", target_id="results", hx_trigger="keyup delay:500ms"),
+            Div(id="results"), 
         Titled(
-            H1(B("Burger Kong")),
-            H3("All Menu"),
+            H1(B("Burger Kong"), style="color : #502314;"),
+            H3("All Menu", style="color : #502314;"),
             Grid(
                 *[product_card(p) for p in system.get_menu_list()],
                 id="product-list",
@@ -385,21 +413,16 @@ def home():
 
 @app.get("/detail/{menu_id}")
 def detail(menu_id: int):
-    try:
-        menu_id = int(menu_id)
-    except ValueError:
-        return "Invalid menu ID."
-    
     menu = system.select_menu(menu_id)
     if not menu:
         return "Menu item not found."
-    
+
     return Title(f"{menu.get_name()} Detail"), Container(
-        Img(src=pic, alt="Menu image"),
+        Img(src=menu.get_src(), alt="Menu image"),
         Titled(
-            H1(B(menu.get_name())),
-            H3(f"Price: ${menu.get_price()}"),
-            P(menu.get_details()),
+            H1(B(menu.get_name()), style="color : #502314;"),
+            H3(f"Price: ${menu.get_price()}", style="color : #502314;"),
+            P(menu.get_details(), style="color : #502314;"),
         ),
         style="background-color: #f5ebdc; padding: 20px;"
     )
