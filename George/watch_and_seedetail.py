@@ -344,9 +344,9 @@ pic = "/logo.png"
 def product_card(p): 
     menu_id = p.get_id()
     return Card(
-        H3(p.get_name(), style="text-align: center; margin: 10px 0; color : #502314;"),
+        H3(p.get_name(), style="text-align: center; margin: 10px 0;"),
         Img(src=p.get_src(), alt="ภาพตัวอย่าง", style="width: 100px; height: 100px; display: block; margin: auto;"),
-        P(f"${p.get_price()}", style="text-align: center; font-weight: bold; color : #502314;"),
+        P(f"${p.get_price()}", style="text-align: center; font-weight: bold;"),
         Form(
             Input(type="hidden", name = str(menu_id)),
             Button("SeeDetail", type="submit"),
@@ -368,63 +368,142 @@ def product_card(p):
         )
     )
 
-
 @app.get('/search')
 def search(search: str):
     results = system.search_products_by_name(search)
-    return H1(f"result : {search}", style="color : #502314;"),Grid(
-                *[product_card(p) for p in results],
-                id="product-list",
-                style="""
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 20px;
-                    justify-items: center;
-                    align-items: center;
-                    margin: 0 auto;
-                """
-            )
+    return Div(*[product_card(p) for p in results],
+                id="product-list")
 
 @app.get("/")
 def home():
-    return Title("Burger Kong"), Container(
-        Img(src=pic, alt="ภาพตัวอย่าง",style="height : 200px; widght : 200px;"),
-        Form(Input(id="search", placeholder="Search products..."), 
-           hx_get="/search", target_id="results", hx_trigger="keyup delay:500ms"),
-            Div(id="results"), 
-        Titled(
-            H1(B("Burger Kong"), style="color : #502314;"),
-            H3("All Menu", style="color : #502314;"),
-            Grid(
-                *[product_card(p) for p in system.get_menu_list()],
-                id="product-list",
-                style="""
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 20px;
-                    justify-items: center;
-                    align-items: center;
-                    margin: 0 auto;
-                """
-            )
+    return Title("Burger Kong"),Container(
+        Div(
+            Div(
+                Div(
+                    Button("☰", 
+                        style="""
+                            background: transparent; 
+                            border: none; 
+                            color: #502314;
+                            font-size: 24px;
+                            width: 40px; 
+                            height: 40px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0;
+                            padding: 0;
+                            cursor: pointer;
+                        """
+                    ),
+                    Img(src="https://i.imgur.com/fCpADUO.png", 
+                        style="width: 55px; height: auto; margin: 0px;"
+                    ),
+                    H2("Burger Kong", style="color: #502314; margin: 0;"),
+                    style="display: flex; align-items: center; gap: 10px;"
+                ),
+                Div(
+                    Form(Input(id="search", placeholder="Search products..."), 
+                    hx_get="/search", target_id="results", hx_trigger="keyup delay:500ms"),
+                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
+                        style="width: 40px; height: auto; margin-right: 15px;"),
+                    Img(src="https://i.imgur.com/AcIDazc.png",
+                        style="width: 40px; height: auto; margin-right: 15px;"),
+                    Img(src="https://i.imgur.com/Kj7efMN.png",
+                        style="width: 40px; height: auto; margin-right: 10px;"),
+                    Img(src="https://i.imgur.com/2eQjSEg.png",
+                        style="width: 40px; height: auto; margin-right: 20px;"),
+                    style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
+                ),
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
+            ),
+            style="""
+                width: 100%; 
+                background: #f5ebdc; 
+                padding: 15px; 
+                border-bottom: 2px solid #502314;
+                position: fixed; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                z-index: 1000;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+            """
         ),
-        style="background-color: #f5ebdc;"
+        Body(
+            Div(
+                *[Button(text, style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;") 
+                for text in ["Combo Set", "Burger", "Beverage", "Snack"]],
+                style="""
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    padding: 20px; 
+                    background: #f8e3c2; 
+                    margin-top: 40px; 
+                    width: 100%; 
+                    align-items: center;
+                    display: flex;
+                    justify-content: center;
+                    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+                """
+            ),
+            Div(
+                Grid(
+                    *[product_card(p) for p in system.get_menu_list()],
+                    id="results",
+                    style="""
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 15px;
+                        justify-items: center;
+                        align-items: center;
+                        margin-top: 160px;
+                        padding: 20px;
+                        background-color: #f5ebdc;
+                    """
+                ),
+            ),
+            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
+        )
     )
 
 @app.get("/detail/{menu_id}")
-def detail(menu_id: int):
+def detail(menu_id: int): 
     menu = system.select_menu(menu_id)
     if not menu:
         return "Menu item not found."
-
-    return Title(f"{menu.get_name()} Detail"), Container(
-        Img(src=menu.get_src(), alt="Menu image"),
-        Titled(
-            H1(B(menu.get_name()), style="color : #502314;"),
-            H3(f"Price: ${menu.get_price()}", style="color : #502314;"),
-            P(menu.get_details(), style="color : #502314;"),
+    return Title(f"{menu.get_name()} Detail"), Div(
+        Div(
+            Img(src=menu.get_src(), alt="Menu image", style="width: 100%; max-width: 300px; border-radius: 15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);"),
+            Div(
+                H1(B(menu.get_name()), style="font-size: 32px; color: #502314;"),
+                H3(f"Price: ${menu.get_price()}", style="font-size: 24px; color: #8b4513;"),
+                P(menu.get_details(), style="font-size: 18px; color: #333; line-height: 1.5;"),
+                Button("Add to Cart", style="background: #8b4513; color: white; padding: 10px 20px; font-size: 18px; border: none; border-radius: 10px; cursor: pointer; margin-top: 15px;"),
+                style="text-align: left; max-width: 400px;"
+            ),
+            style="""
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 40px;
+                max-width: 800px;
+                width: 90%;
+                background: white;
+                padding: 30px;
+                border-radius: 20px;
+                box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+            """
         ),
-        style="background-color: #f5ebdc; padding: 20px;"
+        style="""
+            min-height: 100vh;
+            width: 100vw;
+            background-color: #f8e3c2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        """
     )
 
 
