@@ -15,7 +15,7 @@ sequenceDiagram
     Cart ->>+ CartItem: get_detail_item()
     CartItem -->>- Cart: return detail_item
     Cart->>Cart: calculate_total()
-    Cart -->>- System: return Cart_detail
+    Cart -->>- System: return Cart detail
     
-    System -->>- UI: return Cart_detai
+    System -->>- UI: return Cart detail
     UI -->>- Member: display Cart detail    
