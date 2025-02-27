@@ -14,7 +14,8 @@ class System:
     def select_menu(self,menu_id):
         menu = self.search_menu_by_id(menu_id)
         return menu
-    
+    def get_usr_list(self):
+        return self.__user_list
     def search_menu_by_id(self,menu_id):
         for menus in self.__menu_list:
             if menu_id == menus.get_id():
@@ -153,7 +154,6 @@ class Menu:
     def __str__(self):
         return self.__name
 
-
 class Snack(Menu):
     pass
 
@@ -191,7 +191,7 @@ class Burger(Menu):
         return self.__addons
 
     def calculate_total_price(self):
-        return self.get_price() + sum(self.__addons.values())
+        return self.tget_price() + sum(self.__addons.values())
 
     def __str__(self):
         addons_str = ", ".join([f"{addon} (+${price})" for addon, price in self.__addons.items()])
@@ -224,26 +224,6 @@ class Cart:
         details = [str(item) for item in self.get_item_list()]
         details.append(f"Total Price: ${self.calculate_total_price():.2f}")
         return "\n".join(details)
-    
-    def update_cart_items(self):
-        cart_items = self.get_item_list()
-        items_html = [
-            Div(
-                P(f"{item.get_menu().name} x {item.get_quantity()} - ${item.get_total_price():.2f}",
-                style="font-size: 20px; color: #502314; font-weight: bold;"),
-                Button("Remove", hx_post=f"/cart/remove/{item.get_menu().id}", hx_target="#cart-items", hx_swap="innerHTML",
-                    style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align:center;"),
-                style="display: flex; justify-content: space-between; align-items: center; padding: 5px;"
-            )
-            for item in cart_items
-        ]
-        return Div(*items_html, id="cart-items")
-
-
-    def update_total(self):
-        return H2(f"Total: ${self.calculate_total_price():.2f}", id="total", 
-                style="color: #D00000; font-weight: bold; margin-top: 10px;",
-              hx_swap_oob="true")
 
     def __str__(self):
         return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
@@ -297,6 +277,34 @@ class PaymentMethod:
     def process_payment(self):
         pass
 
+def create_mockup_instances():
+    system = System()
+    
+    # Create admin and member users
+    admin = Admin(1,"Admin User", "123456789", "adminpass", "SuperAdmin")
+    member = Member(2,"John Doe", "987654321", "memberpass")
+    
+    system._System__user_list = [admin, member]
+    # Assign an address to the member
+    # address = Address("John's Home", "123 Street, City, Country")
+    # member.update_address = address
+    
+    # Create menu items
+    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger")
+    drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium")
+    snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden")
+    
+    menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink")
+    menu_set.add_menu_item = [burger, drink, snack]
+    burger.add_addon("More_Patty",1)
+    burger.add_addon("Bacon",0.75)
+    burger.add_addon("More_Cheese",0.5)
+    system._System__menu_list = [burger, drink, snack, menu_set]
+
+    cart = member.get_cart()
+   
+    return system,member
+
 @dataclass
 class Product:
     def __init__(self, id, name, price):
@@ -306,6 +314,12 @@ class Product:
 
     def get_id(self):
         return self.id
+    
+    def get_price(self):
+        return self.price
+    
+    def get_name(self):
+        return self.name
 
 products = [
     Product(1, "Cheese Burger", 5.99), 
@@ -315,6 +329,7 @@ products = [
 ]
 
 cart = Cart()
+system,member = create_mockup_instances()
 
 def product_card(p):
     return Card(
@@ -390,7 +405,6 @@ def get():
         Body(
         H1("BurgerKong Cart", style="color: #502314; background: #f5ebdc; text-align: center; padding: 10px; padding-top: 70px;"),
         Div(
-            #ใช้แค่ส่ง ไม่ได้เอาไปใช้จริง
             Div(      
                 *[product_card(p) for p in products], 
                 id="product-list",
@@ -427,30 +441,23 @@ def get():
     )
 )
 
+member_id = member.get_id()
+
 @rt('/cart/add/{id}')
 def post(id: int):
     product = next((p for p in products if p.id == id), None)
     if not product:
         return "Product not found"
 
-    cart.add_item(product, 1, product.price)
+    result = system.add_to_cart(member_id, product, 1," ")  
+
+    if result != "Success":
+        return result
+
+    print(system.view_cart(member_id))
 
     return Div(
-        cart.update_cart_items(),
-        cart.update_total() 
-    )
-
-@rt('/cart/remove/{id}')
-def remove_from_cart(id: int):
-    product = next((p for p in products if p.id == id), None)
-    if not product:
-        return "Product not found"
-
-    cart.remove_item(id)
-
-    return Div(
-        cart.update_cart_items(),
-        cart.update_total()
+        system.view_cart(member_id)
     )
  
 serve()
