@@ -6,7 +6,14 @@ class System:
         self.__user_list = []
         self.__menu_list = []
         self.__payment_method = PaymentMethod()
-    
+
+    def search_products_by_name(self, search: str):
+        result = []
+        for i in self.get_menu_list():
+            if search.lower() in i.get_name().lower():
+                result.append(i)
+        return result
+
     def display_menu(self):
         return [f"{menu_item.__class__.__name__}: {menu_item._Menu__name} - ${menu_item._Menu__price}" for menu_item in self.__menu_list]
 
@@ -100,13 +107,17 @@ class Admin(User):
         pass
 
 class Menu:
-    def __init__(self, category, menu_id, name, price, detail):
+    def __init__(self, category, menu_id, name, price, detail, src):
         self.__category = category
         self.__menu_id = menu_id
         self.__name = name
         self.__price = price
         self.__detail = detail
+        self.__src = src
     
+    def get_src(self):
+        return self.__src
+
     def get_id(self):
         return self.__menu_id
 
@@ -126,8 +137,8 @@ class Snack(Menu):
     pass
 
 class MenuSet(Menu):
-    def __init__(self, category, menu_id, name, price, detail):
-        super().__init__(category, menu_id, name, price, detail)
+    def __init__(self, category, menu_id, name, price, detail, src):
+        super().__init__(category, menu_id, name, price, detail, src)
         self.__menu_set_list = []
     
     def add_menu_item(self):
@@ -140,16 +151,16 @@ class MenuSet(Menu):
         pass
 
 class Beverage(Menu):
-    def __init__(self, category, menu_id, name, price, detail, size):
-        super().__init__(category, menu_id, name, price, detail)
+    def __init__(self, category, menu_id, name, price, detail, size, src):
+        super().__init__(category, menu_id, name, price, detail, src)
         self.__size = size
     
     def set_size(self, size):
         self.__size = size
 
 class Burger(Menu):
-    def __init__(self, category, menu_id, name, price, detail, addon):
-        super().__init__(category, menu_id, name, price, detail)
+    def __init__(self, category, menu_id, name, price, detail, addon, src):
+        super().__init__(category, menu_id, name, price, detail, src)
         self.__addon = addon
     
     def add_addon(self, addon):
@@ -281,19 +292,17 @@ def create_mockup_instances():
     member.update_address = address
     
     # Create menu items
-    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger", "Extra Cheese")
-    drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium")
-    snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden")
-    burger2 = Burger("Fast Food", 5, "George Burger", 5.99, "Delicious cheeseburger", "Extra Cheese")
-    drink2 = Beverage("Beverage", 6, "Meen Burger", 1.99, "Refreshing drink", "Medium")
-    snack2 = Snack("Snacks", 7, "Tiw Fries", 2.99, "Crispy and golden")
-    snack3 = Snack("Snacks", 8, "Guide Fries", 2.99, "Crispy and golden")
-    snack4 = Snack("Snacks", 9, "Guide Fries", 2.99, "Crispy and golden")
-    snack5 = Snack("Snacks", 10, "Guide Fries", 2.99, "Crispy and golden")
-    menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink")
+    burger = Burger("Burger", 1, "Cheese Burger", 5.99, "Delicious cheeseburger", "Extra Cheese", "/Burger_select.png")
+    drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium", "/Beverage_select.png")
+    snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden", "/snack_select.png")
+    burger2 = Burger("Burger", 5, "George Burger", 5.99, "Delicious cheeseburger", "Extra Cheese", "/Burger_select.png")
+    drink2 = Beverage("Beverage", 6, "Meen Burger", 1.99, "Refreshing drink", "Medium", "/Beverage_select.png")
+    snack2 = Snack("Snacks", 7, "Tiw Fries", 2.99, "Crispy and golden", "/snack_select.png")
+    snack3 = Snack("Snacks", 8, "Guide Fries", 2.99, "Crispy and golden", "/snack_select.png")
+    menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink", "/combo2.png")
     menu_set.add_menu_item = [burger, drink, snack]
     
-    system._System__menu_list = [burger, drink, snack, menu_set, burger2, drink2, snack2, snack3, snack4, snack5]
+    system._System__menu_list = [burger, drink, snack, menu_set, burger2, drink2, snack2, snack3]
 
     cart = member.get_cart()
     
@@ -336,7 +345,7 @@ def product_card(p):
     menu_id = p.get_id()
     return Card(
         H3(p.get_name(), style="text-align: center; margin: 10px 0;"),
-        Img(src=pic, alt="ภาพตัวอย่าง", style="width: 100px; height: 100px; display: block; margin: auto;"),
+        Img(src=p.get_src(), alt="ภาพตัวอย่าง", style="width: 100px; height: 100px; display: block; margin: auto;"),
         P(f"${p.get_price()}", style="text-align: center; font-weight: bold;"),
         Form(
             Input(type="hidden", name = str(menu_id)),
@@ -352,16 +361,23 @@ def product_card(p):
             "text-align: center; "
             "background: #fff; "
             "border-radius: 10px; "
-            "box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3); "
+            "box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); "
             "display: flex; "
             "flex-direction: column; "
             "justify-content: space-between;"
         )
     )
 
+@app.get('/search')
+def search(search: str):
+    results = system.search_products_by_name(search)
+    # return results
+    return Div(*[product_card(p) for p in results],
+                id="product-list",)
+
 @app.get("/")
 def home():
-    return Container(
+    return Title("Burger Kong"),Container(
         Div(
             Div(
                 Div(
@@ -388,17 +404,39 @@ def home():
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
                 Div(
-                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/AcIDazc.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/Kj7efMN.png",
-                        style="width: 40px; height: auto; margin-right: 10px;"),
-                    Img(src="https://i.imgur.com/2eQjSEg.png",
-                        style="width: 40px; height: auto; margin-right: 20px;"),
+                    Form(
+                        Input(id="search", name="search", placeholder="Search products...",
+                            style="""
+                                background: #f8e3c2; 
+                                border: 2px solid #502314; 
+                                color: #502314; 
+                                padding: 8px 12px; 
+                                border-radius: 10px;
+                                font-size: 16px;
+                                outline: none;
+                                height: 40px;
+                                width: 250px;
+                            """),
+                        hx_get="/search",
+                        target_id="results",
+                        hx_trigger="keyup delay:500ms",
+                        hx_preserve="true",
+                        style="display: flex; align-items: center; justify-content: center; margin-top: 10px;"
+                    ),
+                    Div(
+                        Img(src="https://i.imgur.com/Xyhfm0Q.png",
+                            style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/AcIDazc.png",
+                            style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/Kj7efMN.png",
+                            style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/2eQjSEg.png",
+                            style="width: 40px; height: auto;"),
+                        style="display: flex; align-items: center; gap: 15px; margin-left: 20px;" 
+                    ),
                     style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
                 ),
-                style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
+                style="display: flex; align-items: center; justify-content: space-between; align-items: center; width: 100%; gap: 15px;" 
             ),
             style="""
                 width: 100%; 
@@ -415,7 +453,7 @@ def home():
         ),
         Body(
             Div(
-                *[Button(text, style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;") 
+                *[Button(text,id = text, style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;") 
                 for text in ["Combo Set", "Burger", "Beverage", "Snack"]],
                 style="""
                     position: absolute;
@@ -434,7 +472,7 @@ def home():
             Div(
                 Grid(
                     *[product_card(p) for p in system.get_menu_list()],
-                    id="product-list",
+                    id="results",
                     style="""
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
@@ -448,7 +486,7 @@ def home():
                 ),
             ),
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
-    )
+        )
     )
 
 @app.get("/detail/{menu_id}")
@@ -488,5 +526,6 @@ def detail(menu_id: int):
             justify-content: center;
         """
     )
+
 
 serve()

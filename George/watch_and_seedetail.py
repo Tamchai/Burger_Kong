@@ -7,6 +7,9 @@ class System:
         self.__menu_list = []
         self.__payment_method = PaymentMethod()
 
+    def add_menu(self, menu_item):
+        self.__menu_list.append(menu_item)
+
     def search_products_by_name(self, search: str):
         result = []
         for i in self.get_menu_list():
@@ -292,17 +295,29 @@ def create_mockup_instances():
     member.update_address = address
     
     # Create menu items
-    burger = Burger("Fast Food", 1, "Cheese Burger", 5.99, "Delicious cheeseburger", "Extra Cheese", "/Burger_select.png")
-    drink = Beverage("Beverage", 2, "Coke", 1.99, "Refreshing drink", "Medium", "/Beverage_select.png")
-    snack = Snack("Snacks", 3, "French Fries", 2.99, "Crispy and golden", "/snack_select.png")
-    burger2 = Burger("Fast Food", 5, "George Burger", 5.99, "Delicious cheeseburger", "Extra Cheese", "/Burger_select.png")
-    drink2 = Beverage("Beverage", 6, "Meen Burger", 1.99, "Refreshing drink", "Medium", "/Beverage_select.png")
-    snack2 = Snack("Snacks", 7, "Tiw Fries", 2.99, "Crispy and golden", "/snack_select.png")
-    snack3 = Snack("Snacks", 8, "Guide Fries", 2.99, "Crispy and golden", "/snack_select.png")
-    menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink", "/combo2.png")
+    burger = Burger("Burger", 1, "Ultimate Bacon Burger", 7.59, "Delicious Bacon Burger", "Extra Cheese", "/picture/Ultimate-Bacon-Burger.png")
+    burger2 = Burger("Burger", 2, "Mushroom Swiss Burger", 5.55, "Delicious Mushroom Swiss Burger", "Extra Cheese", "/picture/Mushroom-Swiss-Burger.png")
+    burger3 = Burger("Burger", 3, "Grilled Beef Burger", 5.99, "Let's Try Grilled Beef Burger", "Extra Cheese", "/picture/Grilled-Beef-Burger.png")
+    burger4 = Burger("Burger", 4, "Double Whopper", 5.99, "Delicious Double-Whopper", "Extra Cheese", "/picture/Double-Whopper.png")
+    burger5 = Burger("Burger", 5, "Chicken Fingers Burger", 6.99, "Delicious Chicken Fingers Burger", "Extra Cheese", "/picture/chicken-fingers-burger.png")
+    burger6 = Burger("Burger", 6, "Cheese Burger Chicken", 9.99, "Delicious Cheese Burger Chicken", "Extra Cheese", "/picture/Cheeseburger-chicken.png")
+    burger7 = Burger("Burger", 7, "Burger ham and Cheese", 8.99, "Let's Try This Burger ham and Cheese", "Extra Cheese", "/picture/burger-ham-and-cheese.png")
+    burger8 = Burger("Burger", 8, "Burger Double Cheese", 10.99, "Delicious Burger Double Cheese", "Extra Cheese", "/picture/burger-double-cheese.png")
+
+    snack = Snack("Snacks", 100, "French Fries M", 2.99, "Do not eat French Fries", "/picture/french-fries.png")
+    snack2 = Snack("Snacks", 101, "French Fries L", 3.99, "Medium French Fries", "/picture/french-fries.png")
+    snack3 = Snack("Snacks", 102, "French Fries XXL", 10.99, "Bucket French Fries", "/picture/french-fries.png")
+
+
+
+    drink = Beverage("Beverage", 200, "Coke", 1.99, "Refreshing drink", "Medium", "/picture/cola.png")
+    drink2 = Beverage("Beverage", 201, "Refill Coke", 3.99, "Refill COCACOLA", "Medium", "/picture/cola.png")
+    
+    menu_set = MenuSet("Combo", 300, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
     menu_set.add_menu_item = [burger, drink, snack]
     
-    system._System__menu_list = [burger, drink, snack, menu_set, burger2, drink2, snack2, snack3]
+    for i in [burger, burger2, burger3, burger4,burger5, burger6, burger7, burger8,  snack, snack2, snack3, menu_set, drink, drink2]:
+        system.add_menu(i) 
 
     cart = member.get_cart()
     
@@ -317,27 +332,27 @@ def create_mockup_instances():
     }
 
 # Example usage
-def test_add_to_cart(system, member):
-    print("Displaying menu:")
-    print(system.display_menu())
-    member_id = 2
+# def test_add_to_cart(system, member):
+#     print("Displaying menu:")
+#     print(system.display_menu())
+#     member_id = 2
     
-    print("\nSelecting and adding menu items to cart:")
-    selected_menu = system.select_menu(1)
-    print(f"Selected menu: {selected_menu}")
-    result = system.add_to_cart(member_id, selected_menu, 2)
-    print(f"Add to cart result: {result}")
-    print("Cart contents:")
-    print(member.get_cart())
+#     print("\nSelecting and adding menu items to cart:")
+#     selected_menu = system.select_menu(1)
+#     print(f"Selected menu: {selected_menu}")
+#     result = system.add_to_cart(member_id, selected_menu, 2)
+#     print(f"Add to cart result: {result}")
+#     print("Cart contents:")
+#     print(member.get_cart())
     
-    selected_menu = system.select_menu(2)
-    result = system.add_to_cart(member_id, selected_menu, 2)
-    print("\nUpdated cart contents:")
-    print(member.get_cart())
+#     selected_menu = system.select_menu(2)
+#     result = system.add_to_cart(member_id, selected_menu, 2)
+#     print("\nUpdated cart contents:")
+#     print(member.get_cart())
 
 # Example usage with mockup data
 mockup_data = create_mockup_instances()
-test_add_to_cart(mockup_data["system"], mockup_data["member"])
+# test_add_to_cart(mockup_data["system"], mockup_data["member"])
 system = mockup_data["system"]
 pic = "/logo.png"
 
@@ -371,8 +386,28 @@ def product_card(p):
 @app.get('/search')
 def search(search: str):
     results = system.search_products_by_name(search)
-    return Div(*[product_card(p) for p in results],
-                id="product-list")
+    return Div(
+        Grid(
+            *[product_card(p) for p in results], 
+            style="""
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+                justify-items: center;
+                align-items: center;
+                margin-top: 160px;
+                padding: 20px;
+                background-color: #f5ebdc;
+            # """
+        ),id="product-list"
+    )
+
+
+# @app.get('/category/{category}')
+# def show(category: str):
+#     # results = system.search_products_by_name(search)
+#     # return results
+#     return H1(f"{category}",id="shows")
 
 @app.get("/")
 def home():
@@ -403,19 +438,39 @@ def home():
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
                 Div(
-                    Form(Input(id="search", placeholder="Search products..."), 
-                    hx_get="/search", target_id="results", hx_trigger="keyup delay:500ms"),
-                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/AcIDazc.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/Kj7efMN.png",
-                        style="width: 40px; height: auto; margin-right: 10px;"),
-                    Img(src="https://i.imgur.com/2eQjSEg.png",
-                        style="width: 40px; height: auto; margin-right: 20px;"),
+                    Form(
+                        Input(id="search", name="search", placeholder="Search products...",
+                            style="""
+                                background: #f8e3c2; 
+                                border: 2px solid #502314; 
+                                color: #502314; 
+                                padding: 8px 12px; 
+                                border-radius: 10px;
+                                font-size: 16px;
+                                outline: none;
+                                height: 40px;
+                                width: 250px;
+                            """),
+                        hx_get="/search",
+                        target_id="results",
+                        hx_trigger="keyup delay:500ms",
+                        hx_preserve="true",
+                        style="display: flex; align-items: center; justify-content: center; margin-top: 10px;"
+                    ),
+                    Div(
+                        Img(src="https://i.imgur.com/Xyhfm0Q.png",
+                            style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/AcIDazc.png",
+                            style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/Kj7efMN.png",
+                            style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/2eQjSEg.png",
+                            style="width: 40px; height: auto;"),
+                        style="display: flex; align-items: center; gap: 15px; margin-left: 20px;" 
+                    ),
                     style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
                 ),
-                style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
+                style="display: flex; align-items: center; justify-content: space-between; align-items: center; width: 100%; gap: 15px;" 
             ),
             style="""
                 width: 100%; 
@@ -431,9 +486,8 @@ def home():
             """
         ),
         Body(
-            Div(
-                *[Button(text, style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;") 
-                for text in ["Combo Set", "Burger", "Beverage", "Snack"]],
+            Form(Div(
+                *[Button(text,id = text, style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;")for text in ["Combo Set", "Burger", "Beverage", "Snack"]],
                 style="""
                     position: absolute;
                     left: 0;
@@ -447,11 +501,10 @@ def home():
                     justify-content: center;
                     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
                 """
-            ),
+            )),
             Div(
                 Grid(
                     *[product_card(p) for p in system.get_menu_list()],
-                    id="results",
                     style="""
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
@@ -463,11 +516,10 @@ def home():
                         background-color: #f5ebdc;
                     """
                 ),
-            ),
+            id="results"),
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
         )
     )
-
 @app.get("/detail/{menu_id}")
 def detail(menu_id: int): 
     menu = system.select_menu(menu_id)
