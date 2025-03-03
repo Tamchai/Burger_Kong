@@ -105,7 +105,7 @@ class Member(User):
         # Create cart item with updated price
         self.__cart.add_item(menu, quantity, total_price)
         
-        return "Success"
+        return total_price
 
     def place_order(self):
         pass
@@ -335,9 +335,9 @@ def create_mockup_instances():
     
     menu_set = MenuSet("Combo", 4, "Burger Combo", 9.99, "Burger with fries and drink")
     menu_set.add_menu_item = [burger, drink, snack]
-    burger.add_addon("More Patty",1)
+    burger.add_addon("More_Patty",1)
     burger.add_addon("Bacon",0.75)
-    burger.add_addon("More Cheese",0.5)
+    burger.add_addon("More_Cheese",0.5)
     system._System__menu_list = [burger, drink, snack, menu_set]
 
     cart = member.get_cart()
@@ -357,7 +357,6 @@ def create_mockup_instances():
     
     return system,member
 system,member = create_mockup_instances()
-# Example usage
 # def test_add_to_cart(system, member):
 #     print("Displaying menu:")
 #     print(system.display_menu())
@@ -369,7 +368,7 @@ system,member = create_mockup_instances()
 #     print(f"Selected menu: {selected_menu}")
 
 #     # Add burger with add-ons
-#     result = system.add_to_cart(member_id, selected_menu, 2, "Bacon")
+#     result = system.add_to_cart(member_id, selected_menu, 2, ["Bacon","More_Patty"])
 #     print(f"Add to cart result: {result}")
 #     print("Cart contents:")
 #     print(member.get_cart())
@@ -379,7 +378,7 @@ system,member = create_mockup_instances()
 
 #     print("\nUpdated cart contents:")
 #     print(member.get_cart())
-
+ 
 # test_add_to_cart(system,member)
 selected_menu = system.select_menu(1)
 member_id = member.get_id()
@@ -456,25 +455,18 @@ def get():
                         style="width: 50%; display: flex; flex-direction: column; align-items: left; padding: 20px;"
                     ),
                     Div(
-                        H3("Choose", Class="section-title", style="color: #502314;"),
-                        Div(
-                            Button("Beef", Class="option-btn",style="color: #f5ebdc; font-weight: bold; font-size: 20px; background: #502314; border: 1px solid #502314; border-radius: 20px;"),
-                            Button("Pork", Class="option-btn", style="color: #f5ebdc;font-weight: bold; font-size: 20px; background: #502314; border: 1px solid #502314; border-radius: 20px;"),
-                            style="display: flex; gap: 10px; justify-content: left;"
-                        ),
-                        Hr(style="border: 1px solid #000; opacity: 0.5;"),
                         H4("Add on", Class="section-title", style="color: #502314; font-size: 24px; font-weight: bold; "),                            
                         Form(
                             Div(
-                                Label(CheckboxX(id="More_Patty"), "More Patty +1$", style="color: #502314; font-size: 18px; font-weight: bold;"),
-                                Label(CheckboxX(id="Bacon"), "Bacon +0.75$", style="color: #502314; font-size: 18px; font-weight: bold;"),
-                                Label(CheckboxX(id="More_Cheese"), "More Cheese +0.5$", style="color: #502314; font-size: 18px; font-weight: bold;")
+                                Label(CheckboxX(id="More_Patty", name="More_Patty", value="More_Patty", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"More Patty +1$" , style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(CheckboxX(id="Bacon", name="Bacon", value="Bacon",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Bacon +0.75$" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(CheckboxX(id="More_Cheese", name="More_Cheese", value="More_Cheese", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "More Cheese +0.5$", style="color: #502314; font-size: 18px; font-weight: bold;")
                             ),
                             Hr(style="border: 1px solid #000; opacity: 0.5;"),
                             Div(
                                 Span("Quantity", Class="section-title", style="color: #502314; font-size: 22px; font-weight: bold;"),
                                 Div(
-                                    Button("-", hx_post="/decrement", hx_target="#count", hx_swap="innerHTML", Class="PMBtn",
+                                    Button("-", hx_post="/decrement", hx_target="#count-container", hx_swap="innerHTML", Class="PMBtn",
                                             style="""
                                                 background: transparent; 
                                                 border: none; 
@@ -488,10 +480,16 @@ def get():
                                                 margin: 0;
                                                 padding: 0;
                                                 cursor: pointer;
+                                                font-family: 'Arial', sans-serif !important;
                                             """),
-                                    Span(f"{count}", id="count", Class="PMNumber", style="margin: 0 1px; font-size: 22px; font-weight: bold;"),
-                                    Button("+", hx_post="/increment", hx_target="#count", hx_swap="innerHTML", Class="PMBtn",
+                                    Div(
+                                        Span(f"{count}", id="count", Class="PMNumber", style="margin: 0 1px; font-size: 22px; font-weight: bold; font-family: inherit;"),
+                                        Input(type="hidden" ,name="count" ,id="count-input", value=f"{count}"),
+                                        id="count-container"
+                                    ),
+                                    Button("+", hx_post="/increment", hx_target="#count-container", hx_swap="innerHTML" ,Class="PMBtn",
                                         style="""
+                                                all: unset;
                                                 background: transparent; 
                                                 border: none; 
                                                 color: #502314;
@@ -504,61 +502,94 @@ def get():
                                                 margin: 0;
                                                 padding: 0;
                                                 cursor: pointer;
+                                                font-family: 'Arial', sans-serif !important;
                                             """),
                                     style="color: #502314; display: flex; align-items: center; gap: 10px;"
                                 ),
                                 Class="plusminus",
                                 style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
                             ),
-                            H3("Price - 0$", style="color: #D00; margin-top: 10px; text-align: center;"),
-                            Button("Add to Cart", type="submit", Class="add-to-cart-btn",style="font-weight: bold; font-size: 20px; background-color: #D00; border: 1px solid #502314; border-radius: 20px;"),
+                            H3(f"Price - {base_price:.2f}$", id="price", style="color: #D00; margin: 10px 0px 5px 0px; text-align: center;"),
+                            Button("Add to Cart", type="submit", Class="add-to-cart-btn",
+                                   style="""
+                                        font-weight: bold; 
+                                        font-size: 20px; 
+                                        background-color: #D00; 
+                                        border: 1px solid #502314; 
+                                        border-radius: 20px; 
+                                        margin: 5px auto 0 auto;
+                                    """),
                             method="post",
                             action="/save",
+                            style="margin-bottom: 0px; padding-bottom: 0px; display: flex; flex-direction: column;"
                         ),
                         style="""
-                            width: 50%; 
-                            background: white; 
-                            padding: 20px;
-                            margin-top: 25px;
-                            border-radius: 10px; 
-                            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
-                            display: flex; 
-                            flex-direction: column; 
-                            align-items: left; 
-                            height: 500px; 
-                            justify-content: space-between;"""
-                    ),
+                            width: 50%;
+                            background: white;
+                            padding: 10px 15px;
+                            margin-top: 20px;
+                            border-radius: 10px;
+                            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                            text-align: left;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 8px;
+                        """
+                     ),
                     style="display: flex; justify-content: space-between; width: 90%; max-width: 1200px; margin: auto;"
-                )
+                ),
+                 style="display: flex; justify-content: space-between; align-items: flex-start; width: 90%; max-width: 1200px; margin: auto;"
             ),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
+            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin-top: 50px;"
         )
     )
 
-
-
-@rt('/save')
+base_price = selected_menu.get_price()
+@rt('/save', methods=['POST'])
 def post(More_Patty:str,Bacon:str,More_Cheese:str,count:int):
-    
     return system.add_to_cart(member_id,selected_menu,count,[More_Patty,Bacon,More_Cheese])
-    
 
 @app.post("/increment")
 def increment():
-    print("incrementing")
     global count
     count += 1
-    return f"{count}"
+    return update_count_and_price()
+
 @app.post("/decrement")
 def decrement():
-    print("decrementing")
     global count
-    count -= 1
-    if count < 1:
-        count = 1
-    return f"{count}"
+    count = max(1, count - 1)
+    return update_count_and_price()
 
-            
+def update_count_and_price():
+    return f"""
+        <span id="count" style="font-size: 22px; font-weight: bold; font-family: inherit;">{count}</span>
+        <input type="hidden" name="count" id="count-input" value="{count}">
+        <div hx-post="/update_price" hx-trigger="load" hx-target="#price" hx-swap="innerHTML"></div>
+    """
+
+@app.post("/update_price")
+async def update_price(
+    More_Patty: Optional[str] = Form(None),
+    Bacon: Optional[str] = Form(None),
+    More_Cheese: Optional[str] = Form(None),
+    count: int = Form(1)
+):
+    total_price = base_price * count  
+
+    if More_Patty:
+        total_price += 1.0 * count
+    if Bacon:
+        total_price += 0.75 * count
+    if More_Cheese:
+        total_price += 0.5 * count
+
+    return f"Price - {total_price:.2f}$"
+
+
+
+
 
 
 # @rt('/change')
