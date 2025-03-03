@@ -49,27 +49,39 @@ def get():
                         Label(Input(type="radio", id="title-mrs", name="title", value="mrs", required=True), " Mrs.",
                             style="color: #502314; font-size: 18px; font-weight: bold;"),
                         style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;"
-                    )
-                ,
+                    ),
                     Div(
                         Input(type="text", id="firstname", name="firstname", placeholder="*Firstname", required=True,
                             style="color: #000; width: 47%; padding: 10px; border-radius: 5px; border: 1px solid #502314; background: #fff;"),
                         Input(type="text", id="lastname",name="lastname", placeholder="*Lastname", required=True,
                             style="color: #000; width: 47%; padding: 10px; border-radius: 5px; border: 1px solid #502314; background: #fff;"),
-                        style="display: flex; justify-content: space-between; margin-bottom: 10px;"
+                        style="display: flex; justify-content: space-between; margin-bottom: 5px;"
                     ),
                     Div(
                         Input(type="text", id="mobile",name="mobile", placeholder="*Mobile no.", required=True,
                             style="color: #000; width: 47%; padding: 10px; border-radius: 5px; border: 1px solid #502314; background: #fff;"),
                         Input(type="date", id="birthdate",name="birthdate", placeholder="*Birth Day", required=True,
                             style="color: #000; width: 47%; padding: 10px; border-radius: 5px; border: 1px solid #502314; background: #fff;"),
-                        style="display: flex; justify-content: space-between; margin-bottom: 10px;"
+                        style="display: flex; justify-content: space-between; margin-bottom: 5px;"
                     ),
                     Div(
                         Input(type="email", id="email",name="email", placeholder="*Email", required=True,
                             style="color: #000; width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #502314; background: #fff;"),
-                        style="margin-bottom: 10px;"
+                        style="margin-bottom: 1px;"
                     ),
+                    Div(
+                        P("Password",style="color: #502314; text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 3px;"),
+                        Input(type="password", name="password", placeholder="Password", autocomplete="off",
+                            style="color: #000; width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #502314; background: #fff;"),
+                        style="margin-bottom: 1px;"
+                    ),
+                    Div(
+                        P("Password Confirmation",style="color: #502314; text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 3px;"),
+                        Input(type="password", name="password", placeholder="Password", autocomplete="off",
+                            style="color: #000; width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #502314; background: #fff;"),
+                        style="margin-bottom: 5px; "
+                    ),
+
                     Div(
                         Input(type="checkbox", id="confirm",name="confirm", required=True),
                         " Confirm Register",
