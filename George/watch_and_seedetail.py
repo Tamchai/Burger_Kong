@@ -10,6 +10,13 @@ class System:
     def add_menu(self, menu_item):
         self.__menu_list.append(menu_item)
 
+    def filter_category(self, target_category):
+        results = []
+        for menu in self.__menu_list:
+            if str(menu.get_category()).lower() == str(target_category).lower():
+                results.append(menu)
+        return results
+
     def search_products_by_name(self, search: str):
         result = []
         for i in self.get_menu_list():
@@ -135,6 +142,9 @@ class Menu:
 
     def __str__(self):
         return self.__name
+
+    def get_category(self):
+        return self.__category
 
 class Snack(Menu):
     pass
@@ -304,19 +314,30 @@ def create_mockup_instances():
     burger7 = Burger("Burger", 7, "Burger ham and Cheese", 8.99, "Let's Try This Burger ham and Cheese", "Extra Cheese", "/picture/burger-ham-and-cheese.png")
     burger8 = Burger("Burger", 8, "Burger Double Cheese", 10.99, "Delicious Burger Double Cheese", "Extra Cheese", "/picture/burger-double-cheese.png")
 
-    snack = Snack("Snacks", 100, "French Fries M", 2.99, "Do not eat French Fries", "/picture/french-fries.png")
-    snack2 = Snack("Snacks", 101, "French Fries L", 3.99, "Medium French Fries", "/picture/french-fries.png")
-    snack3 = Snack("Snacks", 102, "French Fries XXL", 10.99, "Bucket French Fries", "/picture/french-fries.png")
-
+    snack = Snack("Snack", 100, "French Fries M", 2.99, "Do not eat French Fries", "/picture/french-fries.png")
+    snack2 = Snack("Snack", 101, "French Fries L", 3.99, "Medium French Fries", "/picture/french-fries.png")
+    snack3 = Snack("Snack", 102, "French Fries XXL", 10.99, "Bucket French Fries", "/picture/french-fries.png")
+    snack4 = Snack("Snack", 103, "French Fries Unlimited", 39.99, "Unlimited French Fries", "/picture/french-fries.png")
+    snack5 = Snack("Snack", 103, "French Fries Unlimited", 39.99, "Unlimited French Fries", "/picture/french-fries.png")
 
 
     drink = Beverage("Beverage", 200, "Coke", 1.99, "Refreshing drink", "Medium", "/picture/cola.png")
     drink2 = Beverage("Beverage", 201, "Refill Coke", 3.99, "Refill COCACOLA", "Medium", "/picture/cola.png")
+    drink3 = Beverage("Beverage", 202, "Coke", 1.99, "Refreshing drink", "Medium", "/picture/cola.png")
+    drink4 = Beverage("Beverage", 203, "Refill Coke", 3.99, "Refill COCACOLA", "Medium", "/picture/cola.png")
+    drink5 = Beverage("Beverage", 204, "Coke", 1.99, "Refreshing drink", "Medium", "/picture/cola.png")
+    drink6 = Beverage("Beverage", 205, "Refill Coke", 3.99, "Refill COCACOLA", "Medium", "/picture/cola.png")
     
-    menu_set = MenuSet("Combo", 300, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    menu_set = MenuSet("Combo Set", 300, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    menu_set2 = MenuSet("Combo Set", 301, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    menu_set3 = MenuSet("Combo Set", 302, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    menu_set4 = MenuSet("Combo Set", 303, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    menu_set5 = MenuSet("Combo Set", 304, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    menu_set6 = MenuSet("Combo Set", 305, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    
     menu_set.add_menu_item = [burger, drink, snack]
     
-    for i in [burger, burger2, burger3, burger4,burger5, burger6, burger7, burger8,  snack, snack2, snack3, menu_set, drink, drink2]:
+    for i in [burger, burger2, burger3, burger4,burger5, burger6, burger7, burger8,  snack, snack2, snack3, snack4, snack5, menu_set, menu_set2, menu_set3, menu_set4, menu_set5, menu_set6, drink, drink2, drink3, drink4, drink5, drink6]:
         system.add_menu(i) 
 
     cart = member.get_cart()
@@ -402,12 +423,40 @@ def search(search: str):
         ),id="product-list"
     )
 
+@app.get('/filter')
+def filter(category: str):
+    results = system.filter_category(category)
+    if category == 'All Menu': 
+        return Div(
+                Grid(
+                    *[product_card(p) for p in system.get_menu_list()],
+                    style="""
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 15px;
+                        justify-items: center;
+                        align-items: center;
+                        margin-top: 160px;
+                        padding: 20px;
+                        background-color: #f5ebdc;
+                    """
+                ),id="product-list")
+    else :
+        return Div(
+            Grid(
+                *[product_card(p) for p in results], 
+                style="""
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 15px;
+                    justify-items: center;
+                    align-items: center;
+                    margin-top: 160px;
+                    padding: 20px;
+                    background-color: #f5ebdc;
+                # """
+            ),id="product-list")
 
-# @app.get('/category/{category}')
-# def show(category: str):
-#     # results = system.search_products_by_name(search)
-#     # return results
-#     return H1(f"{category}",id="shows")
 
 @app.get("/")
 def home():
@@ -487,7 +536,10 @@ def home():
         ),
         Body(
             Form(Div(
-                *[Button(text,id = text, style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;")for text in ["Combo Set", "Burger", "Beverage", "Snack"]],
+                *[Button(text, name="category", value=text, id=text, 
+                style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;")
+                for text in ["All Menu", "Combo Set", "Burger", "Beverage", "Snack"]]
+,
                 style="""
                     position: absolute;
                     left: 0;
@@ -501,10 +553,13 @@ def home():
                     justify-content: center;
                     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
                 """
-            )),
+            ),
+                        hx_get="/filter",
+                        target_id="results",
+                        hx_trigger="click"),
             Div(
                 Grid(
-                    *[product_card(p) for p in system.get_menu_list()],
+                    Div(*[product_card(p) for p in system.get_menu_list()],
                     style="""
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
@@ -514,7 +569,7 @@ def home():
                         margin-top: 160px;
                         padding: 20px;
                         background-color: #f5ebdc;
-                    """
+                    """),
                 ),
             id="results"),
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
