@@ -101,13 +101,27 @@ def get():
                         ),
                         style="background: #f5ebdc; width: 100%;"
                     ),
-                    H3("Coupon Discount", style="color: #502314;"),
-                    Select([Option("Select coupon", value="", style="color: #D00000; border-radius: 10px")], style="background: #fff; width:100%; margin-top:5px;"),
+                    Div(
+                        H3("Coupon Discount", style="color: #502314; margin-right: 10px;"),
+                        Button("Apply Coupon", 
+                            style="""
+                                background: #D00000; 
+                                color: white; 
+                                border: none; 
+                                padding: 5px 10px; 
+                                cursor: pointer; 
+                                border-radius: 5px;
+                                font-size: 16px;
+                                font-weight: bold;
+                            """
+                        ),
+                        style="display: flex; align-items: center; justify-content: space-between;"
+                    ),
                     H3("Additional Message", style="color: #502314;"),
-                    Label(CheckboxX(id="cutlery"), "Cutlery", style="color: #502314;"),
-                    Label(CheckboxX(id="sauce"), "Sauce", style="color: #502314;"),
-                    Textarea(placeholder="Additional Message", style="background: #fff; width: 100%; height: 50px; margin-top: 5px; border: 1px solid #ccc; color: #000;"),
-                    H2("Total:", id="total", style="color: #D00000; font-weight: bold;"),
+                    Label(CheckboxX(id="cutlery"), "Cutlery", style="color: #502314; font-weight: bold;"),
+                    Label(CheckboxX(id="sauce"), "Sauce", style="color: #502314; font-weight: bold;"),
+                    Textarea(placeholder="Additional Message", style="background: #fff; width: 100%; height: 100px; margin-top: 5px; border: 1px solid #ccc; color: #000;"),
+                    H2("Total:0.00$", id="total", style="color: #D00000; font-weight: bold;"),
                     Button("Checkout", style="background-color: #D00000; color: #ffffff; width: 100%; margin-top: 10px; padding: 10px; border: none;"),
                     style="width: 50%; padding: 15px;"
                 ),
@@ -117,4 +131,4 @@ def get():
         )
     )
 
-serve()                                                                         
+serve()
