@@ -1,11 +1,82 @@
 from fasthtml.common import * 
-app, rt = fast_app(live=True)
+from routing import app
+from routing import rt
+# app, rt = fast_app(live=True)
+
+class User:
+    def __init__(self, user_id, name, tel, password):
+        self.__user_id = user_id
+        self.__name = name
+        self.__tel = tel
+        self.__password = password
+    def get_id(self):
+        return self.__user_id 
+    def logout(self):
+        pass
+
+    def update_profile(self):
+        pass
+    def get_name (self):
+        return self.__name
+    def get_tel (self):
+        return self.__tel
+    def get_password (self):
+        return self.__password
+    
+    def __str__(self):
+        return f"{self.__name} {self.__password}"
+
+class Member(User):
+    def __init__(self, user_id, name, tel, password, lastname):
+        super().__init__(user_id, name, tel, password)
+        self.__order_list = []
+        self.__address = None
+        self.__payment = None
+        self.__point = 0
+        self.__coupon_list = []
+        self.__cart = Cart()
+        self.__lastname = lastname
+    def get_cart(self):
+        return self.__cart
+    def set_cart(self, cart):
+        self.__cart = cart
+    def add_to_cart(self, menu, quantity):
+        if quantity <= 0:
+            return "Error: Quantity must be a positive number."
+        self.__cart.add_item(menu, quantity)
+        return "Success"
+    def place_order(self):
+        pass 
+    def exchange_point_to_coupon(self):
+        pass    
+    def view_order_history(self):
+        pass    
+    def update_address(self):
+        pass
+    def get_lastname(self):
+        return self.__lastname
+
+class Admin(User):
+    def __init__(self, user_id, name, tel, password, admin_type):
+        super().__init__(user_id, name, tel, password)
+        self.__type = admin_type   
+    def manage_menu(self):
+        pass
+    def view_orders(self):
+        pass
 
 class System:
     def __init__(self):
         self.__user_list = []
         self.__menu_list = []
         self.__payment_method = PaymentMethod()
+
+    def register(self, new_user:User):
+        for user in self.__user_list:
+            if user.get_name() == new_user.get_name():
+                return False
+        self.__user_list.append(new_user)
+        return True
 
     def add_menu(self, menu_item):
         self.__menu_list.append(menu_item)
@@ -51,70 +122,15 @@ class System:
         if quantity <= 0:
             return "Error: Quantity must be a positive number."
         member.add_to_cart(menu_item, quantity)
-        
-    def login(self):
-        pass
     
-    def register(self):
-        pass
-
-class User:
-    def __init__(self, user_id, name, tel, password):
-        self.__user_id = user_id
-        self.__name = name
-        self.__tel = tel
-        self.__password = password
-    def get_id(self):
-        return self.__user_id 
-    def logout(self):
-        pass
+    def get_user_list(self):
+        return self.__user_list
     
-    def update_profile(self):
-        pass
-
-class Member(User):
-    def __init__(self, user_id, name, tel, password):
-        super().__init__(user_id, name, tel, password)
-        self.__order_list = []
-        self.__address = None
-        self.__payment = None
-        self.__point = 0
-        self.__coupon_list = []
-        self.__cart = Cart()
-
-    def get_cart(self):
-        return self.__cart
-    def set_cart(self, cart):
-        self.__cart = cart
-        
-    def add_to_cart(self, menu, quantity):
-        if quantity <= 0:
-            return "Error: Quantity must be a positive number."
-        self.__cart.add_item(menu, quantity)
-        return "Success"
-    
-    def place_order(self):
-        pass
-    
-    def exchange_point_to_coupon(self):
-        pass
-    
-    def view_order_history(self):
-        pass
-    
-    def update_address(self):
-        pass
-
-class Admin(User):
-    def __init__(self, user_id, name, tel, password, admin_type):
-        super().__init__(user_id, name, tel, password)
-        self.__type = admin_type
-    
-    def manage_menu(self):
-        pass
-    
-    def view_orders(self):
-        pass
+    def check_password(self, input_username, input_passwd):
+        for user in self.__user_list:
+            if user.get_name() == input_username and user.get_password() == input_passwd :
+                return True
+        return False
 
 class Menu:
     def __init__(self, category, menu_id, name, price, detail, src):
@@ -127,22 +143,16 @@ class Menu:
     
     def get_src(self):
         return self.__src
-
     def get_id(self):
         return self.__menu_id
-
     def get_details(self):
         return self.__detail
-
     def get_name(self):
         return self.__name
-
     def get_price(self):
         return self.__price
-
     def __str__(self):
         return self.__name
-
     def get_category(self):
         return self.__category
 
@@ -153,13 +163,10 @@ class MenuSet(Menu):
     def __init__(self, category, menu_id, name, price, detail, src):
         super().__init__(category, menu_id, name, price, detail, src)
         self.__menu_set_list = []
-    
     def add_menu_item(self):
         pass
-    
     def remove_menu_item(self):
         pass
-    
     def get_total_price(self):
         pass
 
@@ -167,7 +174,6 @@ class Beverage(Menu):
     def __init__(self, category, menu_id, name, price, detail, size, src):
         super().__init__(category, menu_id, name, price, detail, src)
         self.__size = size
-    
     def set_size(self, size):
         self.__size = size
 
@@ -175,14 +181,12 @@ class Burger(Menu):
     def __init__(self, category, menu_id, name, price, detail, addon, src):
         super().__init__(category, menu_id, name, price, detail, src)
         self.__addon = addon
-    
     def add_addon(self, addon):
         self.__addon = addon
 
 class Cart:
     def __init__(self):
         self.__item_list = []
-    
     def add_item(self, menu, quantity):
         for item in self.__item_list:
             if item.get_menu() == menu:
@@ -191,16 +195,12 @@ class Cart:
         new_item = CartItem(menu, quantity)
         self.__item_list.append(new_item)
         return "Item added to cart."
-    
     def get_item_list(self):
         return self.__item_list
-    
     def __str__(self):
         return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
-    
     def remove_item(self):
         pass
-    
     def get_total(self):
         pass
 
@@ -210,17 +210,13 @@ class CartItem:
         self.__amount = amount
     def get_menu(self):
         return self.__menu
-    
     def add_cart_item(self, menu, amount):
         self.__menu = menu
         self.__amount = amount
-    
     def __str__(self):
         return f"{self.__menu.get_name()} x {self.__amount} (${self.__menu.get_price()} each)"
-    
     def get_quantity(self):
         return self.__amount
-
     def update_quantity(self, quantity):
         self.__amount += quantity
 
@@ -232,16 +228,12 @@ class Order:
         self.__total_price = 0.0
         self.__cart_items = []
         self.__payment = None
-    
     def add_item(self):
         pass
-    
     def remove_item(self):
         pass
-    
     def calculate_total(self):
         pass
-    
     def checkout(self):
         pass
 
@@ -249,7 +241,6 @@ class Address:
     def __init__(self, name, detail):
         self.__name = name
         self.__detail = detail
-    
     def update_address(self):
         pass
 
@@ -261,7 +252,6 @@ class Payment:
         self.__status = status
         self.__discount = discount
         self.__payment_method = payment_method
-    
     def refund_payment(self):
         pass
 
@@ -269,7 +259,6 @@ class PaymentMethod:
     def __init__(self, payment_method_id=None, payment_method_name=None):
         self.__payment_method_id = payment_method_id
         self.__payment_method_name = payment_method_name
-    
     def process_payment(self):
         pass
 
@@ -295,8 +284,8 @@ def create_mockup_instances():
     system = System()
     
     # Create admin and member users
-    admin = Admin(1, "Admin User", "123456789", "adminpass", "SuperAdmin")
-    member = Member(2, "John Doe", "987654321", "memberpass")
+    admin = Admin(1, "admin", "123456789", "admin", "SuperAdmin")
+    member = Member(2, "John", "987654321", "John","Doe")
     
     system._System__user_list = [admin, member]
     
@@ -328,12 +317,12 @@ def create_mockup_instances():
     drink5 = Beverage("Beverage", 204, "Coke", 1.99, "Refreshing drink", "Medium", "/picture/cola.png")
     drink6 = Beverage("Beverage", 205, "Refill Coke", 3.99, "Refill COCACOLA", "Medium", "/picture/cola.png")
     
-    menu_set = MenuSet("Combo Set", 300, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
-    menu_set2 = MenuSet("Combo Set", 301, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
-    menu_set3 = MenuSet("Combo Set", 302, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
-    menu_set4 = MenuSet("Combo Set", 303, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
-    menu_set5 = MenuSet("Combo Set", 304, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
-    menu_set6 = MenuSet("Combo Set", 305, "Burger Combo", 9.99, "Burger with fries and drink", "picture/combo2.png")
+    menu_set = MenuSet("Combo Set", 300, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/combo2.png")
+    menu_set2 = MenuSet("Combo Set", 301, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/combo2.png")
+    menu_set3 = MenuSet("Combo Set", 302, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/combo2.png")
+    menu_set4 = MenuSet("Combo Set", 303, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/combo2.png")
+    menu_set5 = MenuSet("Combo Set", 304, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/combo2.png")
+    menu_set6 = MenuSet("Combo Set", 305, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/combo2.png")
     
     menu_set.add_menu_item = [burger, drink, snack]
     
@@ -457,8 +446,7 @@ def filter(category: str):
                 # """
             ),id="product-list")
 
-
-@app.get("/")
+@rt("/home", methods=["GET","POST"])
 def home():
     return Title("Burger Kong"),Container(
         Div(
@@ -575,6 +563,7 @@ def home():
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
         )
     )
+
 @app.get("/detail/{menu_id}")
 def detail(menu_id: int): 
     menu = system.select_menu(menu_id)
