@@ -60,7 +60,17 @@ def get():
             H1("Order Summary", style="color: #502314; text-align: center; padding: 10px;"),
             Div(
                 H3("Delivery to", style="color: #502314;"),
-                Input(placeholder="Address", style="color: #000; background: #fff; width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 10px"),
+                Select(
+                    children=[],
+                    style="""
+                        background: #fff; 
+                        border: 1px solid #ccc; 
+                        border-radius: 5px; 
+                        padding: 8px; 
+                        font-size: 16px;
+                            color: #502314;
+                    """
+                ),
                 style="""
                     background: #f5ebdc; 
                     padding: 15px; 
