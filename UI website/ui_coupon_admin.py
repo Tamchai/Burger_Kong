@@ -1,54 +1,23 @@
 from fasthtml.common import *
+from dataclasses import dataclass
 
 app, rt = fast_app(live=True)
+products = []
 
-user_points = 150
-
-coupons = [
-    {"id": 1, "name": "ส่วนลด 10%", "points": 100},
-    {"id": 2, "name": "ฟรีเฟรนช์ฟรายส์", "points": 200}
-]
+class Product:
+    def __init__(self,name,percent,expiration):
+        self.name = name
+        self.percent = percent  
+        self.expiration = expiration
 
 @rt('/')
 def get():
     return Container(
-        Div(
+         Div(
             Div(
-                Div(
-                    Button("☰", 
-                        style="""
-                            background: transparent; 
-                            border: none; 
-                            color: #502314;
-                            font-size: 24px;
-                            width: 40px; 
-                            height: 40px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            margin: 0;
-                            padding: 0;
-                            cursor: pointer;
-                        """
-                    ),
-                    Img(src="https://i.imgur.com/fCpADUO.png", 
-                        style="width: 55px; height: auto; margin: 0px;"
-                    ),
-                    H2("Burger Kong", style="color: #502314; margin: 0;"),
-                    style="display: flex; align-items: center; gap: 10px;"
-                ),
-                Div(
-                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/AcIDazc.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/Kj7efMN.png",
-                        style="width: 40px; height: auto; margin-right: 10px;"),
-                    Img(src="https://i.imgur.com/2eQjSEg.png",
-                        style="width: 40px; height: auto; margin-right: 20px;"),
-                    style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
-                ),
-                style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
+                Button(
+                    Img(src="https://i.imgur.com/fCpADUO.png", style="width: 60px; height: auto;"),
+                        style="background: none; border: none; cursor: pointer;"),
             ),
             style="""
                 width: 100%; 
@@ -61,44 +30,97 @@ def get():
                 width: 100%; 
                 z-index: 1000;
                 box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+                text-align: center;
             """
-        ),
+         ),
         Body(
-            H1("Coupon Rewards", style="color: #502314; background: #f5ebdc; text-align: center; padding: 10px; padding-top: 70px;"),
-            Div(
-                Div(
-                    Div(
-                        H1("Coupon", style="color: #502314;"),
-                        Button("เพิ่มคูปอง", id="add-coupon", hx_post="/add-coupon", hx_target="#cart-items", style="background: #502314; color: white; padding: 5px 10px; border: none; border-radius: 10px; cursor: pointer;"),
-                        style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
-                    ),
-                    Div(id="cart-items", children=[generate_coupon_list()], style="flex-grow: 1; width: 100%;"),
-                    style="display: flex; flex-direction: column; width: 100%; height: 100%; flex-grow: 1;"
-                ),
-                style="display: flex; flex-direction: column; background: #f5ebdc; padding: 20px; border-radius: 30px; width: 75%; height: 90vh; margin: auto; border: 1px solid #502314;"
+            Form(
+               H2("Coupon Manager",style="color: #502314; text-align: center;"),
+               Div(
+                P("Name Coupon",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                Input(id="name",name="name",placeholder="Name menu",
+                        style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;"),
+               ),
+               Div(
+                P("Percent",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                Input(id="percent",name="percent",type="number",step="1",
+                        style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;"), 
+               ),
+               Div(
+                P("Expiration date",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                Input(id="expiration",name="expiration",placeholder="Expiration date",
+                        style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;"), 
+               ),
+               Button("Add",style="font-weight: bold; font-size: 16px; color: #fff; text-align: center; background: #502314; border-radius: 5px; border: none; width: 90px;"),
+               method="post",
+               action="/product",
+               style="""
+                  background: #f5ebdc; 
+                  padding: 15px; 
+                  border-radius: 10px; 
+                  width: 90%; 
+                  border: 1px solid #502314; 
+                  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+                  margin: auto;
+                  position: relative;
+                  top: -50px;
+                """
             ),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+            Table(
+               Thead(
+                  Tr(
+                     Th("Name Coupone", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
+                     Th("Percent", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
+                     Th("Expiration Date", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
+                     Th("Action", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
+                  )
+               ),
+               Tbody(
+                  *[
+                     Tr(
+                        Td(p.name, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                        Td(f"{p.percent}%", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                        Td(p.expiration, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                        Td(
+                           Button("Delete",
+                            hx_post=f"/delete/{p.name}",
+                            hx_target="#product",
+                            hx_swap="outerHTML",
+                            style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
+                        ),
+                           style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
+                        )
+                     ) 
+                     for p in products
+                  ]
+               ),
+               style="""
+                  background: #f5ebdc;
+                  border: 2px solid #502314;
+                  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+                  width: 90%;
+                  margin: auto;
+                  border-radius: 10px;
+                  text-align: center;
+                  position: relative;
+                  top: -35px;
+               """
+            ),
+        style="margin-top: 3%;background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
         )
     )
 
-# ฟังก์ชันสร้างรายการคูปอง
-def generate_coupon_list():
-    return Div(
-        *[
-            Div(
-                P(f"{coupon['name']} - ใช้ {coupon['points']} แต้ม", style="color: #502314; padding: 5px 0;"),
-                Button("แลก", style="background: #502314; color: white; padding: 5px 10px; border: none; border-radius: 10px; cursor: pointer;"),
-                style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #502314;"
-            )
-            for coupon in coupons
-        ]
-    )
+@rt("/product")
+def post(name:str,percent:int,expiration:str):
+    global products
+    product = Product(name,percent,expiration)
+    products.append(product)
+    return RedirectResponse("/", status_code=303)
 
-# API สำหรับเพิ่มคูปองใหม่ (Admin เท่านั้น)
-@rt('/add-coupon', methods=["POST"])
-def add_coupon():
-    new_coupon = {"id": len(coupons) + 1, "name": "ส่วนลด 20%", "points": 300}
-    coupons.append(new_coupon)
-    return generate_coupon_list()
+@rt("/delete/{name}")
+def delete(name: str):
+    global products
+    products = [p for p in products if p.name != name]
+    return RedirectResponse("/", status_code=303)
 
 serve()
