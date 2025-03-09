@@ -28,6 +28,45 @@ class System:
             if users.get_id() == user_id:
                 return users
             
+    def watch_cart(self, user_id):
+        member = self.search_user_by_id(user_id)
+        return member.get_cart()        
+    
+    def remove_from_cart(self,user_id,menu_id):
+        member = self.search_user_by_id(user_id)
+        cart = member.get_cart()
+        return cart.remove_item(menu_id)
+    
+    def show_total_price(self,user_id):
+        member = self.search_user_by_id(user_id)
+        cart = member.get_cart()
+        return cart.calculate_total_price()
+    
+    def checkout(self,user_id):
+        member = self.search_user_by_id(user_id)
+        return member.checkout()
+    
+    def show_user_coupon(self,user_id):
+        member = self.search_user_by_id(user_id)
+        return member.get_coupon()
+    
+    def apply_coupon(self,user_id,coupon):
+        member = self.search_user_by_id(user_id)
+        cart = member.get_cart()
+        return cart.apply_coupon(coupon,member)
+    
+    def create_order(self,user_id):
+        member = self.search_user_by_id(user_id)
+        return member.create_order()
+    
+    def pay_order(self,user_id,order,payment_method):
+        member = self.search_user_by_id(user_id)
+        return member.pay_order(order,payment_method)
+    
+    def exchange_point_to_coupon(self,user_id,point):
+        member = self.search_user_by_id(user_id)
+        return member.exchange_point_to_coupon(point)
+    
     def add_to_cart(self, user_id, menu_item, quantity, addons=None):
         member = self.search_user_by_id(user_id)
         if not menu_item:
@@ -83,7 +122,8 @@ class Member(User):
 
     def get_cart(self):
         return self.__cart
-    
+    def get_point(self):
+        return self.__point
     def set_cart(self, cart):
         self.__cart = cart
 
@@ -207,8 +247,7 @@ class Menu:
     def get_price(self):
         return self.__price
 
-    def __str__(self):
-        return self.__name
+    
 
 
 class Snack(Menu):
@@ -305,8 +344,9 @@ class Cart:
     def __str__(self):
         return "\n".join(str(item) for item in self.__item_list) if self.__item_list else "Cart is empty"
     
-    def remove_item(self, menu_id):
-        self.__item_list = [item for item in self.__item_list if item.get_menu().get_id() != menu_id]
+    def remove_item(self, menu):
+        self.__item_list = [item for item in self.__item_list if item.get_menu().get_id() != menu.get_id()]
+        # self.__item_list = self.__item_list.remove(menu_id)
     
     def checkout(self):
         pass
@@ -495,61 +535,68 @@ def testrun(system, member):
     
     # ดูรายละเอียดของตะกร้า
     print("\nCart contents before removing an item:")
-    print(member.get_cart().get_cart_details())
+    print(system.watch_cart(member_id))
 
     # ลบสินค้าออกจากตะกร้า
+    selected_menu = system.select_menu(1)
     print("\nRemoving an item from cart (Burger)...")
-    member.get_cart().remove_item(1)
-    
+    system.remove_from_cart(member_id,selected_menu)
     # ดูรายละเอียดตะกร้าหลังลบ
     print("\nCart contents after removing Burger:")
-    print(member.get_cart().get_cart_details())
+    print(system.watch_cart(member_id))
 
     # ตรวจสอบยอดรวมของตะกร้า
-    total_price = member.get_cart().calculate_total_price()
+    total_price = system.show_total_price(member_id)
     print(f"\nTotal price after removing Burger: ${total_price:.2f}")
 
 
     print("\nCart Summary ก่อนใช้คูปอง:")
-    print(member.checkout())
+    
+    print(system.checkout(member_id))
 
     # ใช้คูปองลดราคา 10%
-    coupon = member.get_coupon()
+    coupon = system.show_user_coupon(member_id)
+    index = 0 #Index ของ Dropdown เด้อครับพี่น้อง
     print(coupon)
-    member.get_cart().apply_coupon(coupon[0],member)
-
+    system.apply_coupon(member_id,coupon[index])
+    total_price = system.show_total_price(member_id)
+    print(f"\nc ${total_price:.2f}")
+   
+    
     # แสดงตะกร้าหลังใช้คูปอง
     print("\nCart Summary หลังใช้คูปอง:")
-    print(member.checkout())
+    print(system.checkout(member_id))
+    print(f"Total = {total_price}")
+    
     
     print(coupon)
 
     # กดยืนยันออเดอร์
     print("\nCreating Order...")
     # payment = CreditCard("1234567890123456", "12/25", "123")
-    order_id = member.create_order()
+    order_id = system.create_order(member_id)
 
 
-    # print("test")
-    # selected_menu = system.select_menu(1)
-    # result = system.add_to_cart(member_id, selected_menu, 2, ["Bacon", "More_Patty"])
-    # print(f"Add to cart result: {result}")
-    # print(member.get_cart().get_cart_details())
+    # # print("test")
+    # # selected_menu = system.select_menu(1)
+    # # result = system.add_to_cart(member_id, selected_menu, 2, ["Bacon", "More_Patty"])
+    # # print(f"Add to cart result: {result}")
+    # # print(member.get_cart().get_cart_details())
     
 
-    # print("\nCreating Order...")
-    # # payment = CreditCard("1234567890123456", "12/25", "123")
-    # print(member.create_order())
+    # # print("\nCreating Order...")
+    # # # payment = CreditCard("1234567890123456", "12/25", "123")
+    # # print(member.create_order())
 
     print("\nOrder List:")
     for order in member.get_order_list():
         print(order)
     
     payment_method = CreditCard("1234567890123456", "12/25", "123")
-    print(member.pay_order(order_id, payment_method))
+    print(system.pay_order(member_id,order_id,payment_method))
     for order in member.get_order_list():
         print(order)
-    
-    print(member.exchange_point_to_coupon(10))
+    point = member.get_point()
+    print(system.exchange_point_to_coupon(member_id,point))
     print(member.get_coupon())
 testrun(system, member)
