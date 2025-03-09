@@ -76,24 +76,27 @@ def get():
                   )
                ),
                Tbody(
-                  *[
-                     Tr(
-                        Td(p.name, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
-                        Td(f"{p.percent}%", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
-                        Td(p.expiration, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
-                        Td(
-                           Button("Delete",
-                            hx_post=f"/delete/{p.name}",
-                            hx_target="#product",
-                            hx_swap="outerHTML",
-                            style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
-                        ),
-                           style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
-                        )
-                     ) 
-                     for p in products
-                  ]
-               ),
+                    id="product-list",  # Add this ID for targeting updates
+                    *[
+                        Tr(
+                            Td(p.name, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                            Td(f"{p.percent}%", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                            Td(p.expiration, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                            Td(
+                                Button("Delete",
+                                    hx_delete=f"/delete/{p.name}",  # ✅ Use hx_delete for proper HTTP semantics
+                                    hx_target="#product-list",  # ✅ Targets the table body
+                                    hx_swap="outerHTML",  # ✅ Replaces only the table body, not the full page
+                                    style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
+                                )
+                                ,
+                                style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
+                            )
+                        ) 
+                        for p in products
+                    ]
+                )
+                ,
                style="""
                   background: #f5ebdc;
                   border: 2px solid #502314;
@@ -121,6 +124,25 @@ def post(name:str,percent:int,expiration:str):
 def delete(name: str):
     global products
     products = [p for p in products if p.name != name]
-    return RedirectResponse("/", status_code=303)
+    return Tbody(
+        id="product-list",
+        *[
+            Tr(
+                Td(p.name, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                Td(f"{p.percent}%", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                Td(p.expiration, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                Td(
+                    Button("Delete",
+                        hx_delete=f"/delete/{p.name}",
+                        hx_target="#product-list",
+                        hx_swap="outerHTML",
+                        style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
+                    ),
+                    style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
+                )
+            ) for p in products
+        ]
+    )
+
 
 serve()
