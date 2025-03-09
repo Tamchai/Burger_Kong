@@ -388,25 +388,9 @@ def get():
         Div(
             Div(
                 Div(
-                    Button("☰", 
-                        style="""
-                            background: transparent; 
-                            border: none; 
-                            color: #502314;
-                            font-size: 24px;
-                            width: 40px; 
-                            height: 40px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            margin: 0;
-                            padding: 0;
-                            cursor: pointer;
-                        """
-                    ),
-                    Img(src="https://i.imgur.com/fCpADUO.png", 
-                        style="width: 55px; height: auto; margin: 0px;"
-                    ),
+                    Button(
+                        Img(src="https://i.imgur.com/fCpADUO.png", style="width: 50px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
                     H2("Burger Kong", style="color: #502314; margin: 0;"),
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
@@ -415,13 +399,13 @@ def get():
                         Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
                     Button(
-                        Img(src="https://i.imgur.com/AcIDazc.png", style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/JZR6dA6.png", style="width: 45px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
                     Button(
-                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 45px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
-                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
-                    ),
+                    style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
+                ),
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
             ),
             style="""
@@ -587,6 +571,11 @@ async def update_price(
         total_price += 0.5 * count
 
     return f"Price - {total_price:.2f}$"
+
+
+
+
+
 
 # @rt('/change')
 # def get(): return P('Nice to be here!')
