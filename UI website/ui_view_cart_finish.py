@@ -373,25 +373,9 @@ def get():
         Div(
             Div(
                 Div(
-                    Button("☰", 
-                        style="""
-                            background: transparent; 
-                            border: none; 
-                            color: #502314;
-                            font-size: 24px;
-                            width: 40px; 
-                            height: 40px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            margin: 0;
-                            padding: 0;
-                            cursor: pointer;
-                        """
-                    ),
-                    Img(src="https://i.imgur.com/fCpADUO.png", 
-                        style="width: 55px; height: auto; margin: 0px;"
-                    ),
+                    Button(
+                        Img(src="https://i.imgur.com/fCpADUO.png", style="width: 50px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
                     H2("Burger Kong", style="color: #502314; margin: 0;"),
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
@@ -400,13 +384,13 @@ def get():
                         Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
                     Button(
-                        Img(src="https://i.imgur.com/AcIDazc.png", style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/JZR6dA6.png", style="width: 45px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
                     Button(
-                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 45px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
-                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
-                    ),
+                    style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
+                ),
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
             ),
             style="""
@@ -430,17 +414,20 @@ def get():
                         Div(
                             H2("Your Order", style="color: #502314;"),
                             Button("Add more", style="background: #502314; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align: center;"),
-                            style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
+                            style="display: flex; justify-content: space-between; align-items: center; width: 98%;  padding-bottom: 10px;"
                         ),
                         Div(id="cart-items",
-                            *[Div(
+                            *[
+                                Div(
                                 Div(f"{item.get_menu().get_name()} x {item.get_quantity()} ", 
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
-                                Div(f"${item.get_total_price():.2f}", 
-                                    style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
+                                Div(f"${item.get_total_price():.2f}",
+                                    Button("Remove", style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align: center; margin-left: 10px;"),
+                                    style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px; gap 50px; display: flex; justify-content: space-between; align-items: center;"),
                                 style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid rgba(80, 35, 20, 0.2); padding: 5px 0;"
-                            ) for item in member.get_cart().get_item_list()],
-                            style="flex-grow: 1; width: 98%; align-items: flex-start; overflow-y: auto; padding: 10px;"
+                            ) 
+                                for item in member.get_cart().get_item_list()],
+                            style="flex-grow: 1; width: 98%; align-items: flex-start;  padding: 10px;"
                         ),
                         Div(
                             H3("Discount:", style="color: #502314;"),
@@ -460,6 +447,7 @@ def get():
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
         )
 )
+
 
 @rt('/cart/add/{id}')
 def post(id: int):
