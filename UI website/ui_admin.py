@@ -13,8 +13,9 @@ def get():
     return Container(
          Div(
             Div(
-                 Img(src="https://i.imgur.com/fCpADUO.png", 
-                    style="width: 70px; height: auto; margin: 0px;"),
+                Button(
+                    Img(src="https://i.imgur.com/fCpADUO.png", style="width: 60px; height: auto;"),
+                        style="background: none; border: none; cursor: pointer;"),
             ),
             style="""
                 width: 100%; 
@@ -33,12 +34,21 @@ def get():
         Body(
             Form(
                H2("Product Manager",style="color: #502314; text-align: center;"),
-               Input(id="name",name="name",placeholder="Name",
+               Div(
+                P("Name Menu",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                Input(id="name",name="name",placeholder="Name menu",
                         style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;"),
-               Input(id="price",name="price",type="number",step="0.01",
+               ),
+               Div(
+                P("Price",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                Input(id="price",name="price",type="number",step="0.01",
                         style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;"), 
-               Input(id="description",name="description",placeholder="Description",
+               ),
+               Div(
+                P("Description",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                Input(id="description",name="description",placeholder="Description",
                         style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;"), 
+               ),
                Button("Add",style="font-weight: bold; font-size: 16px; color: #fff; text-align: center; background: #502314; border-radius: 5px; border: none; width: 90px;"),
                method="post",
                action="/product",
@@ -91,7 +101,7 @@ def get():
                   top: -35px;
                """
             ),
-        style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+        style="margin-top: 3%;background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
         )
     )
 
