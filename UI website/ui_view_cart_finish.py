@@ -222,7 +222,6 @@ class Cart:
             return "Cart is empty"
             
         details = [str(item) for item in self.get_item_list()]
-        # print("Cart Details:", details) 
         details.append(f"Total Price: ${self.calculate_total_price():.2f}")
         return "\n".join(details)
 
@@ -231,7 +230,6 @@ class Cart:
     
     def remove_item(self, menu_id):
         self.__item_list = [item for item in self.__item_list if item.get_menu().get_id() != menu_id]
-
 
     def get_total(self):
         pass
@@ -398,16 +396,17 @@ def get():
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
                 Div(
-                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/AcIDazc.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/Kj7efMN.png",
-                        style="width: 40px; height: auto; margin-right: 10px;"),
-                    Img(src="https://i.imgur.com/2eQjSEg.png",
-                        style="width: 40px; height: auto; margin-right: 20px;"),
-                    style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
-                ),
+                    Button(
+                        Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                    Button(
+                        Img(src="https://i.imgur.com/AcIDazc.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                    Button(
+                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
+                    ),
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
             ),
             style="""
@@ -434,11 +433,14 @@ def get():
                             style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
                         ),
                         Div(id="cart-items",
-                            *[Div(f"{item.get_menu().get_name()} x {item.get_quantity()} - ${item.get_total_price():.2f}", 
-                                style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px; border-bottom: 1px solid rgba(80, 35, 20, 0.2);")  
-                            for item in member.get_cart().get_item_list()]
-                        ,
-                            style="flex-grow: 1; width: 100%;"
+                            *[Div(
+                                Div(f"{item.get_menu().get_name()} x {item.get_quantity()} ", 
+                                    style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
+                                Div(f"${item.get_total_price():.2f}", 
+                                    style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
+                                style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid rgba(80, 35, 20, 0.2); padding: 5px 0;"
+                            ) for item in member.get_cart().get_item_list()],
+                            style="flex-grow: 1; width: 98%; align-items: flex-start; overflow-y: auto; padding: 10px;"
                         ),
                         Div(
                             H3("Discount:", style="color: #502314;"),
