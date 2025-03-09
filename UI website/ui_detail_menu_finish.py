@@ -411,16 +411,17 @@ def get():
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
                 Div(
-                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/AcIDazc.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/Kj7efMN.png",
-                        style="width: 40px; height: auto; margin-right: 10px;"),
-                    Img(src="https://i.imgur.com/2eQjSEg.png",
-                        style="width: 40px; height: auto; margin-right: 20px;"),
-                    style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
-                ),
+                    Button(
+                        Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                    Button(
+                        Img(src="https://i.imgur.com/AcIDazc.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                    Button(
+                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
+                    ),
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
             ),
             style="""
@@ -541,7 +542,7 @@ def get():
                 ),
                  style="display: flex; justify-content: space-between; align-items: flex-start; width: 90%; max-width: 1200px; margin: auto;"
             ),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin-top: 50px;"
+            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin-top: 5%; position: relative; "
         )
     )
 
@@ -586,11 +587,6 @@ async def update_price(
         total_price += 0.5 * count
 
     return f"Price - {total_price:.2f}$"
-
-
-
-
-
 
 # @rt('/change')
 # def get(): return P('Nice to be here!')
