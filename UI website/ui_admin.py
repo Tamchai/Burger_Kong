@@ -6,7 +6,10 @@ products = []
 
 @dataclass
 class Product:
-   name: str; price: float; description: str
+   name: str
+   price: float
+   description: str
+   image: str 
 
 @rt('/')
 def get():
@@ -34,6 +37,11 @@ def get():
         Body(
             Form(
                H2("Product Manager",style="color: #502314; text-align: center;"),
+               Div(
+                  P("Image URL", style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                  Input(id="image_url", name="image", type="text", placeholder="Enter Image URL",
+                        style="color: #502314; background: #fff; border-radius: 5px; border: 2px solid #502314;"),
+                  ),
                Div(
                 P("Name Menu",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
                 Input(id="name",name="name",placeholder="Name menu",
@@ -67,6 +75,7 @@ def get():
             Table(
                Thead(
                   Tr(
+                     Th("Image", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
                      Th("Name", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
                      Th("Price", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
                      Th("Description", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
@@ -76,6 +85,10 @@ def get():
                Tbody(
                   *[
                      Tr(
+                        Td(
+                           Img(src=p.image, style="width: 50px; height: auto;"),
+                           style="text-align: center; background: #fff8f0; padding: 8px; border: 1px solid #502314;"
+                        ),
                         Td(p.name, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
                         Td(f"${p.price:,.2f}", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
                         Td(p.description, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
@@ -101,7 +114,7 @@ def get():
                   top: -35px;
                """
             ),
-        style="margin-top: 3%;background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+        style="margin-top: 7%;background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
         )
     )
 
