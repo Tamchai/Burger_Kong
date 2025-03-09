@@ -101,22 +101,18 @@ def get():
                         ),
                         style="background: #f5ebdc; width: 100%;"
                     ),
-                    Div(
                         H3("Coupon Discount", style="color: #502314; margin-right: 10px;"),
-                        Button("Apply Coupon", 
-                            style="""
-                                background: #D00000; 
-                                color: white; 
-                                border: none; 
-                                padding: 5px 10px; 
-                                cursor: pointer; 
-                                border-radius: 5px;
+                        Select(
+                            children=[],
+                            style=""" 
+                                background: #fff; 
+                                border: 1px solid #ccc; 
+                                border-radius: 5px; 
+                                padding: 8px; 
                                 font-size: 16px;
-                                font-weight: bold;
+                                color: #502314;
                             """
                         ),
-                        style="display: flex; align-items: center; justify-content: space-between;"
-                    ),
                     H3("Additional Message", style="color: #502314;"),
                     Label(CheckboxX(id="cutlery"), "Cutlery", style="color: #502314; font-weight: bold;"),
                     Label(CheckboxX(id="sauce"), "Sauce", style="color: #502314; font-weight: bold;"),
