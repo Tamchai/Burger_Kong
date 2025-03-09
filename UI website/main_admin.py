@@ -2,13 +2,6 @@ from fasthtml.common import *
 from dataclasses import dataclass
 
 app, rt = fast_app(live=True)
-products = []
-
-class Product:
-    def __init__(self, name, percent, expiration):
-        self.name = name
-        self.percent = percent  
-        self.expiration = expiration
 
 @rt('/')
 def get():
@@ -38,7 +31,7 @@ def get():
                 H2("Manager", style="color: #502314; text-align: center; margin-bottom: 10%;"),
                 Div(
                     Div(
-                        Button("View Customer",
+                        Button("View Order All",
                             style="""
                             font-weight: bold; 
                             font-size: 16px; 
@@ -48,7 +41,24 @@ def get():
                             border-radius: 5px; 
                             border: none; 
                             width: 100%;
-                            margin-bottom: 10%;
+                            height: 50px;
+                            padding: 10px;
+                            """
+                        ),
+                    ),
+                    Div(
+                        Button("View Member Order",
+                            style="""
+                            font-weight: bold; 
+                            font-size: 16px; 
+                            color: #fff; 
+                            text-align: center; 
+                            background: #502314; 
+                            border-radius: 5px; 
+                            border: none; 
+                            width: 100%;
+                            height: 50px;
+                            padding: 10px;
                             """
                         ),
                     ),
@@ -63,7 +73,8 @@ def get():
                             border-radius: 5px; 
                             border: none; 
                             width: 100%;
-                            margin-bottom: 5%;
+                            height: 50px;
+                            padding: 10px;
                             """
                         ),
                     ),
@@ -78,7 +89,8 @@ def get():
                             border-radius: 5px; 
                             border: none; 
                             width: 100%;
-                            margin-bottom: 5%;
+                            height: 50px;
+                            padding: 10px;
                             """
                         ),
                     ),
@@ -87,6 +99,8 @@ def get():
                         flex-direction: column;
                         justify-content: center;
                         align-items: center;
+                        gap: 15px;
+                        width: 250px;
                     """
                 ),
                 style="""
