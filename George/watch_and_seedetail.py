@@ -1,6 +1,5 @@
 from fasthtml.common import * 
-from routing import app
-from routing import rt
+from routing import app, rt
 # app, rt = fast_app(live=True)
 
 class User:

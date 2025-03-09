@@ -1,5 +1,5 @@
 from fasthtml.common import *
-from routing import app
+from routing import app, rt
 import watch_and_seedetail
 # app, rt = fast_app(live=True)
 system = watch_and_seedetail.system  
@@ -96,7 +96,7 @@ def creat_account_page():
                 H3("Create Account", 
                    style="font-size: 32px; text-align: center; color: #502314; font-weight: bold; font-family: 'Arial', sans-serif; margin-top: 50px;"),
                     Button("<", 
-                        type = "submit",
+                        type = "button" , onclick = "history.back()",
                         style="""
                             position: fixed; 
                             top: 100px; 
