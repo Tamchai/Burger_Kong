@@ -494,15 +494,16 @@ def home():
                         style="display: flex; align-items: center; justify-content: center; margin-top: 10px;"
                     ),
                     Div(
-                        Img(src="https://i.imgur.com/Xyhfm0Q.png",
-                            style="width: 40px; height: auto;"),
-                        Img(src="https://i.imgur.com/AcIDazc.png",
-                            style="width: 40px; height: auto;"),
-                        Img(src="https://i.imgur.com/Kj7efMN.png",
-                            style="width: 40px; height: auto;"),
-                        Img(src="https://i.imgur.com/2eQjSEg.png",
-                            style="width: 40px; height: auto;"),
-                        style="display: flex; align-items: center; gap: 15px; margin-left: 20px;" 
+                        Button(
+                            Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        Button(
+                            Img(src="https://i.imgur.com/AcIDazc.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        Button(
+                            Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
                     ),
                     style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
                 ),
