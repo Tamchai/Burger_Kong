@@ -1,0 +1,15 @@
+sequenceDiagram
+    actor USER
+    participant UI
+    participant System
+    participant Menu
+    participant Member
+    USER ->>+ UI : USER already login
+    UI ->>+ System : display_menu()
+    loop for menu in menu_list
+        System ->>+ Menu : get_Detail()
+        Menu -->>- System : return Detail
+        System ->> System : append to all_menu_list[]
+    end
+    System -->>- UI : return all_menu_list[]
+    UI -->>- USER : Show all menu

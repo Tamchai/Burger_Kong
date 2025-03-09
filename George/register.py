@@ -65,7 +65,7 @@ def login_page():
                         top: -70px;
                     """
             ),
-            style="background: #f5ebdc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; position: relative; top: 40px;"
+            style="background: #f5ebdc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;"
         )
     )
 

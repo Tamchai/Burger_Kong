@@ -1,0 +1,15 @@
+sequenceDiagram
+    actor USER
+    participant UI
+    participant System
+    participant Menu
+	USER ->>+ UI : User Select Menu
+    UI ->>+ System : select_menu(menu_id)
+    loop menus in menu_list
+        System ->> Menu : get_id()
+        Menu -->> System : return id
+        alt if menu_id == id
+            System -->>- UI : return menu
+        end
+    end
+    UI -->>- USER : Show Selected Menu

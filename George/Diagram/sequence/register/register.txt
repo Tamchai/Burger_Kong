@@ -1,0 +1,27 @@
+sequenceDiagram
+    actor USER
+    participant UI
+    participant System
+    participant Member
+    USER ->> UI : USER click create account button
+    UI -->> USER : Show register page
+    USER ->> UI : USER click Register button
+    alt if password == confirm_password 
+        UI ->> System : register(new_user)
+    else
+        UI -->> USER : password doesn't match
+    end
+    loop for user in user_list
+        System ->> Member : user.get_name()
+        Member -->> System : return user_name
+        alt user.name == new_user.name
+            System -->> UI : retrun False
+            UI -->> USER : Register Fail
+        else
+            System ->> System : append new_user to user_list
+            System -->> UI : return True 
+            UI -->> USER : Show watch_menu page
+        end
+    end
+    
+    

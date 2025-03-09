@@ -1,0 +1,24 @@
+sequenceDiagram
+  actor USER
+  participant UI as UI
+  participant System as System
+  participant User as User
+  USER ->>+ UI : USER ENTER WEBSITE
+  UI -->>- USER : return login_page
+  USER ->>+ UI : USER enter input_username&input_password
+  UI ->>+ System : check_password(input_username, input_password)
+  loop for user in user_list 
+    System ->>+User : get_name()
+    User -->> System : return name
+    System ->>User : get_password()
+    User -->>- System : return password  
+    alt input_username == name and input_password == password
+        System -->> UI : return True
+        UI -->> USER : Login Success
+    else 
+    System -->>- UI : return False
+    UI -->>- USER : Login Fail
+    end
+  end
+  
+  
