@@ -1,8 +1,9 @@
 from fasthtml.common import *
 from routing import app, rt
-import watch_and_seedetail
+import server
+from server import Admin 
 # app, rt = fast_app(live=True)
-system = watch_and_seedetail.system  
+system = server.system  
 
 @app.get('/')
 def login_page():
@@ -65,7 +66,7 @@ def login_page():
                         top: -70px;
                     """
             ),
-            style="background: #f5ebdc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; position: relative; top: 40px;"
+            style="background: #f5ebdc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;"
         )
     )
 
@@ -74,8 +75,48 @@ def creat_account_page():
     return Title("Burger Kong"), Container(
         Div(
             Div(
-                Img(src="https://i.imgur.com/fCpADUO.png", 
-                    style="width: 70px; height: auto; margin: 0px;"),
+                Div(
+                    Img(src="https://i.imgur.com/fCpADUO.png", 
+                        style="width: 55px; height: auto; margin: 0px;"
+                    ),
+                    H2("Burger Kong", style="color: #502314; margin: 0;"),
+                    style="display: flex; align-items: center; gap: 10px;"
+                ),
+                Div(
+                    Form(
+                        Input(id="search", name="search", placeholder="Search products...",
+                            style="""
+                                background: #f8e3c2; 
+                                border: 2px solid #502314; 
+                                color: #502314; 
+                                padding: 8px 12px; 
+                                border-radius: 10px;
+                                font-size: 16px;
+                                outline: none;
+                                height: 40px;
+                                width: 250px;
+                            """),
+                        hx_get="/search",
+                        target_id="results",
+                        hx_trigger="keyup delay:500ms",
+                        hx_preserve="true",
+                        style="display: flex; align-items: center; justify-content: center; margin-top: 10px;"
+                    ),
+                    Div(
+                        Button(
+                            Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        Button(
+                            Img(src="https://i.imgur.com/AcIDazc.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        Button(
+                            Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
+                    ),
+                    style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
+                ),
+                style="display: flex; align-items: center; justify-content: space-between; align-items: center; width: 100%; gap: 15px;" 
             ),
             style="""
                 width: 100%; 
@@ -88,7 +129,6 @@ def creat_account_page():
                 width: 100%; 
                 z-index: 1000;
                 box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
-                text-align: center;
             """
         ),
         Body(
@@ -182,7 +222,7 @@ def creat_account_page():
                         border: 2px solid #502314;
                     """
                 ),
-                style="position: relative; top: 5px;"
+                style="position: relative; top: -100px;"
             ),
             style="background: #f5ebdc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;"
         )
@@ -193,7 +233,7 @@ def register(title: str, firstname: str, lastname: str, mobile: str, birthdate: 
     if str(password) != str(confirm_password):
         return H1("Password doesn't match"), Form(Button("back", type="submit"))
     else:
-        new_user = watch_and_seedetail.Member(
+        new_user = server.Member(
             user_id = len(system.get_user_list()) + 1,
             name = firstname,
             tel = mobile,
@@ -201,14 +241,20 @@ def register(title: str, firstname: str, lastname: str, mobile: str, birthdate: 
             lastname = lastname
         )
         if system.register(new_user):
+            # Update the global variable in watch_and_seedetail
+            server.current_user_id = new_user.get_id()
             return RedirectResponse("/home")
         else: 
             return H1("Registration failed: Username already exists.")
 
 @app.get('/login')
 def login(username: str, password: str):
-    if system.check_password(username, password):
+    status, user = system.check_password(username, password)
+    if not status:
+        return H1("Access denied")
+    if isinstance(user, Admin):
+        return RedirectResponse("/admin")
+    else:
         return RedirectResponse("/home")
-    return H1("Access denied")
 
 serve()
