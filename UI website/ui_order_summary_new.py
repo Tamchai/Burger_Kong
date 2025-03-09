@@ -8,25 +8,9 @@ def get():
         Div(
             Div(
                 Div(
-                    Button("☰", 
-                        style="""
-                            background: transparent; 
-                            border: none; 
-                            color: #502314;
-                            font-size: 24px;
-                            width: 40px; 
-                            height: 40px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            margin: 0;
-                            padding: 0;
-                            cursor: pointer;
-                        """
-                    ),
-                    Img(src="https://i.imgur.com/fCpADUO.png", 
-                        style="width: 55px; height: auto; margin: 0px;"
-                    ),
+                    Button(
+                        Img(src="https://i.imgur.com/fCpADUO.png", style="width: 50px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;"),
                     H2("Burger Kong", style="color: #502314; margin: 0;"),
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
@@ -35,10 +19,10 @@ def get():
                         Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
                     Button(
-                        Img(src="https://i.imgur.com/AcIDazc.png", style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/JZR6dA6.png", style="width: 45px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
                     Button(
-                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 40px; height: auto;"),
+                        Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 45px; height: auto;"),
                             style="background: none; border: none; cursor: pointer;"),
                     style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
                 ),
@@ -134,8 +118,26 @@ def get():
                 ),
                 style="display: flex; justify-content: space-between; background: #f5ebdc; padding: 15px; border-radius: 30px; width: 60%; margin: auto; margin-top: 20px; border: 1px solid #502314;"
             ),
+        
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 120px;"
-        )
-    )
+        ),
+    Footer(
+        Div(
+            H3("Contact Us", style="color: #fff; text-align: center; margin-bottom: 10px;"),
+            Div("For inquiries, please visit our website or contact our customer service.", style="color: #fff;"),
+        ),
+             style=""" 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #502314;
+                padding: 15px;
+                width: 100%;
+                position: absolute;
+                margin-top: 10px;
+                left: 0;
+            """
+        ),
+)
 
 serve()
