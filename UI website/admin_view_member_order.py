@@ -27,12 +27,11 @@ mock_members = [
         "active": True
     }
 ]
-member = mock_members[0]
+
 
 @rt('/')
 def get():
     return Container(
-        #เปลี่ยน Heder เป็นของ member ปกติเลย
         Div(
             Button(
                 Img(src="https://i.imgur.com/fCpADUO.png", style="width: 60px; height: auto;"),
@@ -52,7 +51,7 @@ def get():
             """
         ),
         Body(
-            H1("Your Orders", style="color: #502314; text-align: center; padding: 10px; margin-top: 80px;"),
+            H1("Member Orders", style="color: #502314; text-align: center; padding: 10px; margin-top: 80px;"),
             Div(
                 *[
                     Div(
@@ -68,17 +67,19 @@ def get():
                         Div(
                             *[
                                 Div(
-                                    f"{order['name']} - {order['quantity']}x | {order['price']} ฿",
+                                    f"{order['name']} - {order['quantity']}x | {order['price']} $",
                                     style="font-size: 18px; font-weight: bold; color: #502314; padding: 5px;"
                                 ) for order in member["orders"]
                             ],
                             style="padding-left: 10px;"
                         ),
                         H3(
-                            f"Total Price: {sum(order['quantity'] * order['price'] for order in member['orders'])} ฿",
-                            style="""
+                            f"Total Price: {sum(order['quantity'] * order['price'] for order in member['orders'])} $",
+                            style=""" 
                                 color: #502314; 
                                 padding: 5px 10px; 
+                                border-radius: 10px; 
+                                
                             """
                         ),
                         H3(
