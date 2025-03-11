@@ -6,21 +6,28 @@ app, rt = fast_app(live=True)
 # Mock Data for Members
 mock_members = [
     {
-        "name": "John Doe",
-        "orders": ["Burger King Combo", "Cheese Fries"],
+        "orders": [
+            {"name": "Burger King Combo", "quantity": 1, "price": 150},
+            {"name": "Cheese Fries", "quantity": 2, "price": 50}
+        ],
         "active": True
     },
     {
-        "name": "Jane Smith",
-        "orders": ["Spicy Chicken Burger", "Onion Rings"],
+        "orders": [
+            {"name": "Spicy Chicken Burger", "quantity": 1, "price": 120},
+            {"name": "Onion Rings", "quantity": 1, "price": 80}
+        ],
         "active": False
     },
     {
-        "name": "Alex Johnson",
-        "orders": ["Double Cheeseburger", "Large Soda"],
+        "orders": [
+            {"name": "Double Cheeseburger", "quantity": 1, "price": 180},
+            {"name": "Large Soda", "quantity": 2, "price": 40}
+        ],
         "active": True
     }
 ]
+member = mock_members[0]
 
 @rt('/')
 def get():
@@ -44,27 +51,34 @@ def get():
             """
         ),
         Body(
-            H1("Member Orders", style="color: #502314; text-align: center; padding: 10px; margin-top: 80px;"),
+            H1("Your Orders", style="color: #502314; text-align: center; padding: 10px; margin-top: 80px;"),
             Div(
                 *[
                     Div(
                         Div(
-                        H2(member["name"], style="color: #502314;"),
-                        Button(
-                            "Delete",
-                            style="background: #D00000; color: white; padding: 5px 10px; border-radius: 10px; border: 1px solid #502314; cursor: pointer;",
-                            **{"hx-get": "/manage_order", "hx-target": "#order-section"}
+                            H2("Name Member", style="color: #502314;"),
+                            Button(
+                                "Delete",
+                                style="background: #D00000; color: white; padding: 5px 10px; border-radius: 10px; border: 1px solid #502314; cursor: pointer;",
+                                **{"hx-get": "/manage_order", "hx-target": "#order-section"}
                             ),
-                        style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px; "
+                            style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
                         ),
                         Div(
                             *[
                                 Div(
-                                    f"{order}",
-                                    style="font-size: 16px; font-weight: bold; color: #502314; padding: 5px;"
+                                    f"{order['name']} - {order['quantity']}x | {order['price']} ฿",
+                                    style="font-size: 18px; font-weight: bold; color: #502314; padding: 5px;"
                                 ) for order in member["orders"]
                             ],
                             style="padding-left: 10px;"
+                        ),
+                        H3(
+                            f"Total Price: {sum(order['quantity'] * order['price'] for order in member['orders'])} ฿",
+                            style="""
+                                color: #502314; 
+                                padding: 5px 10px; 
+                            """
                         ),
                         H3(
                             "Paying" if member["active"] else "Completed",
@@ -76,7 +90,6 @@ def get():
                                 text-align: center;
                             """
                         ),
-
                         style="""
                             background: white; 
                             padding: 20px; 
