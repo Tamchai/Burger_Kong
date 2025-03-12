@@ -15,20 +15,24 @@ def order_summary(current_user_id:int):
                 Div(
                     Button(
                         Img(src="https://i.imgur.com/fCpADUO.png", style="width: 50px; height: auto;"),
-                            style="background: none; border: none; cursor: pointer;"),
+                        style="background: none; border: none; cursor: pointer;"
+                    ),
                     H2("Burger Kong", style="color: #502314; margin: 0;"),
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
                 Div(
                     Button(
                         Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
-                            style="background: none; border: none; cursor: pointer;"),
+                        style="background: none; border: none; cursor: pointer;"
+                    ),
                     Button(
                         Img(src="https://i.imgur.com/JZR6dA6.png", style="width: 45px; height: auto;"),
-                            style="background: none; border: none; cursor: pointer;"),
+                        style="background: none; border: none; cursor: pointer;"
+                    ),
                     Button(
                         Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 45px; height: auto;"),
-                            style="background: none; border: none; cursor: pointer;"),
+                        style="background: none; border: none; cursor: pointer;"
+                    ),
                     style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
                 ),
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
@@ -58,7 +62,7 @@ def order_summary(current_user_id:int):
                         border-radius: 5px; 
                         padding: 8px; 
                         font-size: 16px;
-                            color: #502314;
+                        color: #502314;
                     """
                 ),
                 style="""
@@ -76,19 +80,24 @@ def order_summary(current_user_id:int):
                 Div(
                     Div(
                         H3("Your Order", style="color: #502314; display: inline-block; margin-right: 10px;"),
-                        Form(Button("Add more", style="background: #502314; color: white; padding: 5px 10px; display: inline-block;"),action="/home",method="GET"),
+                        Form(
+                            Button("Add more", style="background: #502314; color: white; padding: 5px 10px; display: inline-block;"),
+                            action="/home",
+                            method="GET"
+                        ),
                         style="display: flex; align-items: center; justify-content: space-between;"
                     ),
                     Div(
                         *[
-                                Div(
+                            Div(
                                 Div(f"{item.get_menu().get_name()} x {item.get_quantity()} ", 
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
                                 Div(f"${item.get_total_price():.2f}",
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px; gap 50px; display: flex; justify-content: space-between; align-items: center;"),
                                 style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid rgba(80, 35, 20, 0.2); padding: 5px 0;"
                             ) 
-                                for item in user.get_cart().get_item_list()]
+                            for item in user.get_cart().get_item_list()
+                        ]
                     ),
                     style="width: 50%; padding: 15px;"
                 ),
@@ -111,23 +120,29 @@ def order_summary(current_user_id:int):
                         ),
                         style="background: #f5ebdc; width: 100%;"
                     ),
-                        H3("Coupon Discount", style="color: #502314; margin-right: 10px;"),
-                        Select(
-                            *[Option(f"{coupon.get_name()} - {coupon.get_discount()}%",id = coupon.get_discount(), name = coupon.get_discount()) for coupon in system.get_coupon_list()]
-                            ,
-                            style=""" 
-                                background: #fff; 
-                                border: 1px solid #ccc; 
-                                border-radius: 5px; 
-                                padding: 8px; 
-                                font-size: 16px;
-                                color: #502314;
-                            """
-                        ),
+                    H3("Coupon Discount", style="color: #502314; margin-right: 10px;"),
+                    # ปรับปรุง Select ให้ส่งค่าไปที่ /update_total เมื่อมีการเปลี่ยนแปลง
+                    Select(
+                        *[Option(f"{coupon.get_name()} - {coupon.get_discount()}%", value=str(coupon.get_discount())) for coupon in system.get_coupon_list()],
+                        name="coupon_discount",
+                        hx_post="/update_total",
+                        hx_trigger="change",
+                        hx_target="#total",
+                        hx_swap="innerHTML",
+                        style=""" 
+                            background: #fff; 
+                            border: 1px solid #ccc; 
+                            border-radius: 5px; 
+                            padding: 8px; 
+                            font-size: 16px;
+                            color: #502314;
+                        """
+                    ),
                     H3("Additional Message", style="color: #502314;"),
                     Label(CheckboxX(id="cutlery"), "Cutlery", style="color: #502314; font-weight: bold;"),
                     Label(CheckboxX(id="sauce"), "Sauce", style="color: #502314; font-weight: bold;"),
                     Textarea(placeholder="Additional Message", style="background: #fff; width: 100%; height: 100px; margin-top: 5px; border: 1px solid #ccc; color: #000;"),
+                    # Element ที่จะแสดงราคาทั้งหมดที่อัปเดตใหม่
                     H2("Total:0.00$", id="total", style="color: #D00000; font-weight: bold;"),
                     Button("Checkout", style="background-color: #D00000; color: #ffffff; width: 100%; margin-top: 10px; padding: 10px; border: none;"),
                     style="width: 50%; padding: 15px;"
@@ -137,12 +152,12 @@ def order_summary(current_user_id:int):
         
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 120px;"
         ),
-    Footer(
-        Div(
-            H3("Contact Us", style="color: #fff; text-align: center; margin-bottom: 10px;"),
-            Div("For inquiries, please visit our website or contact our customer service.", style="color: #fff;"),
-        ),
-             style=""" 
+        Footer(
+            Div(
+                H3("Contact Us", style="color: #fff; text-align: center; margin-bottom: 10px;"),
+                Div("For inquiries, please visit our website or contact our customer service.", style="color: #fff;"),
+            ),
+            style=""" 
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -154,6 +169,22 @@ def order_summary(current_user_id:int):
                 left: 0;
             """
         ),
-)
+    )
+
+# Endpoint สำหรับคำนวณราคาทั้งหมดใหม่ เมื่อมีการเลือกคูปองลดราคา
+@app.post("/update_total")
+def update_total(coupon_discount: str = Form("0")):
+    # ใช้ current_user_id จาก server.current_user_id (หรือจะส่งผ่านฟอร์มก็ได้)
+    current_user_id = server.current_user_id
+    user = system.search_user_by_id(current_user_id)
+    subtotal = user.get_cart().calculate_total_price()
+    delivery_fee = 2
+    try:
+        discount_percentage = float(coupon_discount)
+    except:
+        discount_percentage = 0.0
+    discount_amount = subtotal * (discount_percentage / 100)
+    total = subtotal + delivery_fee - discount_amount
+    return f"Total:{total:.2f}$"
 
 serve()
