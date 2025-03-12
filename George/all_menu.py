@@ -1,18 +1,21 @@
 from fasthtml.common import * 
 from routing import app, rt
 import server
+import register
+from server import *
 system = server.system
 count = 1
 base_price = 0
+user_id = server.current_user_id
 def product_card(p): 
     menu_id = p.get_id()
     return Card(
-        H3(p.get_name(), style="text-align: center; margin: 10px 0;"),
+        H3(p.get_name(), style="text-align: center; margin: 10px 0; color: #502314;"),
         Img(src=p.get_src(), alt="ภาพตัวอย่าง", style="width: 100px; height: 100px; display: block; margin: auto;"),
-        P(f"${p.get_price()}", style="text-align: center; font-weight: bold;"),
+        P(f"${p.get_price()}", style="text-align: center; font-weight: bold; color: #502314;"),
         Form(
             Input(type="hidden", name = str(menu_id)),
-            Button("SeeDetail", type="submit"),
+            Button("SeeDetail", type="submit",style="font-weight: bold; background: #D00;"),
             action=f"/detail/{p.get_id()}",
             method="get"
         ),
@@ -88,14 +91,17 @@ def filter(category: str):
 @rt("/home", methods=["GET","POST"])
 def home():
     global count
+    global user_id
+    user_id = server.current_user_id
     count = 1
+    print(user_id)
     return Title("Burger Kong"),Container(
         Div(
             Div(
                 Div(
-                    Button(
+                    Form(Button(
                         Img(src="https://i.imgur.com/fCpADUO.png", style="width: 50px; height: auto;"),
-                            style="background: none; border: none; cursor: pointer;"),
+                            style="background: none; border: none; cursor: pointer;")),      
                     H2("Burger Kong", style="color: #502314; margin: 0;"),
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
@@ -120,16 +126,20 @@ def home():
                         style="display: flex; align-items: center; justify-content: center; margin-top: 10px;"
                     ),
                     Div(
-                        Button(
+                        Form(
+                            Button(
+                            Img(src="https://i.imgur.com/SwkvgTW.png",style="width: 40px; height: auto; margin-right: 15px;"),
+                            style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/select_address/{user_id}", method = "GET"),
+                        Form(Button(
                         Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
-                            style="background: none; border: none; cursor: pointer;"),
-                        Button(
+                            style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/####/{user_id}", method = "GET"),
+                        Form(Button(
                             Img(src="https://i.imgur.com/JZR6dA6.png", style="width: 45px; height: auto;"),
-                                style="background: none; border: none; cursor: pointer;"),
-                        Button(
+                                style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/coupon_member/{user_id}", method = "GET"),
+                        Form(Button(
                             Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 45px; height: auto;"),
-                                style="background: none; border: none; cursor: pointer;"),
-                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;" 
+                                style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/view_cart/{user_id}", method = "POST"),
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;"
                     ),
                     style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
                 ),
@@ -187,7 +197,7 @@ def home():
                     """),
                 ),
             id="results"),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center;"
+            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin-top: 3%;"
         )
     )
 
@@ -260,11 +270,16 @@ def detail(menu_id: int):
                     Div(
                         H4("Add on", Class="section-title", style="color: #502314; font-size: 24px; font-weight: bold; "),                            
                         Form(
-                            Div(
+                            (Div(
                                 Label(CheckboxX(id="More_Patty", name="More_Patty", value="More_Patty", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"More Patty +1$" , style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="Bacon", name="Bacon", value="Bacon",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Bacon +0.75$" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="More_Cheese", name="More_Cheese", value="More_Cheese", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "More Cheese +0.5$", style="color: #502314; font-size: 18px; font-weight: bold;")
-                            ),
+                            ) )if menu.get_category() == "Burger" else (),
+                            (Div(
+                                Label(CheckboxX(id="Small", name="More_Patty", value="More_Patty", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"Small" , style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(CheckboxX(id="Medium", name="Bacon", value="Bacon",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Medium" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(CheckboxX(id="big", name="More_Cheese", value="More_Cheese", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "Large", style="color: #502314; font-size: 18px; font-weight: bold;")
+                            ) )if menu.get_category() == "Beverage" else (),
                             Hr(style="border: 1px solid #000; opacity: 0.5;"),
                             Div(
                                 Span("Quantity", Class="section-title", style="color: #502314; font-size: 22px; font-weight: bold;"),
@@ -342,9 +357,9 @@ def detail(menu_id: int):
                      ),
                     style="display: flex; justify-content: space-between; width: 90%; max-width: 1200px; margin: auto;"
                 ),
-                 style="display: flex; justify-content: space-between; align-items: flex-start; width: 90%; max-width: 1200px; margin: auto;"
+                 style="display: flex; justify-content: space-between; align-items: flex-start; width: 90%; max-width: 1200px; margin: auto; "
             ),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin-top: 5%; position: relative; "
+            style="background: #f5ebdc; min-height: 105vh; display: flex; align-items: center; justify-content: center; margin-top: 5%; position: relative; "
         )
     )
 
@@ -352,6 +367,14 @@ def detail(menu_id: int):
 @rt('/save/{menu_id}', methods=['POST'])
 def post(More_Patty:str,Bacon:str,More_Cheese:str,count:int,menu_id : int):
     global current_user_id
+    menu_id = system.select_menu(menu_id)
+    
+#     File "c:\Users\photc\Desktop\George\all_menu.py", line 357, in post
+#     system.add_to_cart(server.current_user_id,menu_id,count,[More_Patty,Bacon,More_Cheese])
+#   File "c:\Users\photc\Desktop\George\server.py", line 563, in add_to_cart
+#     return member.add_to_cart(menu_item, quantity, addons)
+#            ^^^^^^^^^^^^^^^^^^
+# AttributeError: 'NoneType' object has no attribute 'add_to_cart'
     system.add_to_cart(server.current_user_id,menu_id,count,[More_Patty,Bacon,More_Cheese])
     count = 1
     return RedirectResponse("/home")

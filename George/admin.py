@@ -1,12 +1,11 @@
 from fasthtml.common import *
-from dataclasses import dataclass
-from routing import app, rt  # Use the app and rt from routing.py
+from routing import app, rt
 import server
-
+import admin_product
 system = server.system  
 
-@rt('/admin')
-def get():
+@app.get('/admin')
+def admin_home():
     return Container(
         Div(
             Div(
@@ -33,7 +32,7 @@ def get():
                 H2("Manager", style="color: #502314; text-align: center; margin-bottom: 10%;"),
                 Div(
                     Div(
-                        Button("View Customer",
+                        Form(Button("View Member Order",
                             style="""
                             font-weight: bold; 
                             font-size: 16px; 
@@ -43,12 +42,14 @@ def get():
                             border-radius: 5px; 
                             border: none; 
                             width: 100%;
-                            margin-bottom: 10%;
-                            """
-                        ),
+                            height: 50px;
+                            padding: 10px;
+                            """,
+                            type = "submit"
+                        ), action = "/admin_view_member_order", method = "GET"),
                     ),
                     Div(
-                        Button("Product Manager",
+                        Form(Button("Product Manager",
                             style="""
                             font-weight: bold; 
                             font-size: 16px; 
@@ -58,12 +59,14 @@ def get():
                             border-radius: 5px; 
                             border: none; 
                             width: 100%;
-                            margin-bottom: 5%;
-                            """
-                        ),
+                            height: 50px;
+                            padding: 10px;
+                            """, 
+                            type = "submit"
+                        ), action = "/product_manager", method = "GET"),
                     ),
                     Div(
-                        Button("Coupon Manager",
+                        Form(Button("Coupon Manager",
                             style="""
                             font-weight: bold; 
                             font-size: 16px; 
@@ -73,15 +76,19 @@ def get():
                             border-radius: 5px; 
                             border: none; 
                             width: 100%;
-                            margin-bottom: 5%;
-                            """
-                        ),
+                            height: 50px;
+                            padding: 10px;
+                            """,
+                            type = "submit"
+                        ), action = "/coupon_manager", method = "GET"),
                     ),
                     style="""
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
                         align-items: center;
+                        gap: 15px;
+                        width: 250px;
                     """
                 ),
                 style="""
@@ -104,5 +111,4 @@ def get():
         )
     )
 
-# Remove or comment out the serve() call:
-# serve()
+serve()

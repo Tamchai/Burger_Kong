@@ -1,25 +1,28 @@
 from fasthtml.common import *
 from routing import app, rt
 import server
-# app, rt = fast_app(live=True)
+from server import Menu
+from server import MenuSet
+from server import Burger
+from server import Beverage
+import admin 
+from win10toast import ToastNotifier
 system = server.system 
-products = []
+product_list = system.get_menu_list()
+n = ToastNotifier()
 
-@dataclass
-class Product:
-   name: str
-   price: float
-   description: str
-   image: str 
-
-@app.get('/admin_page')
-def admin_home():
+@rt('/product_manager', methods=["GET","POST"])
+def product_manager():
+    global product_list
     return Title("Admin page"),Container(
          Div(
             Div(
                 Button(
                     Img(src="https://i.imgur.com/fCpADUO.png", style="width: 60px; height: auto;"),
-                        style="background: none; border: none; cursor: pointer;"),
+                        style="background: none; border: none; cursor: pointer;",
+                        type = "button",
+                        onclick = "history.back()"
+                     ),
             ),
             style="""
                 width: 100%; 
@@ -40,7 +43,7 @@ def admin_home():
                H2("Product Manager",style="color: #502314; text-align: center;"),
                Div(
                   P("Image URL", style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
-                  Input(id="image_url", name="image", type="text", placeholder="Enter Image URL",
+                  Input(id="image_url", name="image_url", type="text", placeholder="Enter Image URL",
                         style="color: #502314; background: #fff; border-radius: 5px; border: 2px solid #502314;"),
                   ),
                Div(
@@ -58,9 +61,20 @@ def admin_home():
                 Input(id="description",name="description",placeholder="Description",
                         style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;"), 
                ),
+               Div(
+                P("Category",style="font-size: 18px; font-weight: bold; color: #502314; text-align: left; margin-bottom: 2px;"),
+                Select(
+                       Option("Burger", value="Burger"),
+                       Option("Snack",value="Snack"),
+                       Option("Beverage",value="Beverage"),
+                       Option("Menu Set",value="Menu Set"),
+                        style="color: #000; background: #fff; border-radius: 5px; border: 2px solid #502314;",
+                        id="category",name="category",placeholder="Category"
+                     ), 
+               ),
                Button("Add",style="font-weight: bold; font-size: 16px; color: #fff; text-align: center; background: #502314; border-radius: 5px; border: none; width: 90px;"),
-               method="post",
-               action="/product",
+               method="POST",
+               action="/add_product",
                style="""
                   background: #f5ebdc; 
                   padding: 15px; 
@@ -80,6 +94,7 @@ def admin_home():
                      Th("Name", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
                      Th("Price", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
                      Th("Description", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
+                     Th("Category", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
                      Th("Action", style="text-align: center; background: #502314; color: #fff; padding: 10px; border: 1px solid #502314;"),
                   )
                ),
@@ -87,12 +102,13 @@ def admin_home():
                   *[
                      Tr(
                         Td(
-                           Img(src=p.image, style="width: 50px; height: auto;"),
+                           Img(src=p.get_src(), style="width: 50px; height: auto;"),
                            style="text-align: center; background: #fff8f0; padding: 8px; border: 1px solid #502314;"
                         ),
-                        Td(p.name, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
-                        Td(f"${p.price:,.2f}", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
-                        Td(p.description, style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                        Td(p.get_name(), style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                        Td(f"${p.get_price():,.2f}", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                        Td(p.get_details(), style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                        Td(p.get_category(), style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
                         Td(
                            Button("Delete",
                                  style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
@@ -100,7 +116,7 @@ def admin_home():
                            style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
                         )
                      ) 
-                     for p in products
+                     for p in product_list
                   ]
                ),
                style="""
@@ -119,9 +135,21 @@ def admin_home():
         )
     )
 
-@rt("/product")
-def post(product: Product):
-   products.append(product)
-   return RedirectResponse("/", status_code=303)
-
+@app.post("/add_product")
+def add_coupon(image_url:str, name:str, price:int, description:str, category:str):
+    global product_list
+    if category == "Burger":
+        product_to_add = server.Burger("Burger",len(server.system.get_menu_list())+1,name,price,description,image_url)
+        system.add_menu(product_to_add)
+        return RedirectResponse("/product_manager")
+    elif category == "Beverage":
+        product_to_add = server.Beverage("Beverage",len(server.system.get_menu_list())+1,name,price,description,"Big",image_url)
+        system.add_menu(product_to_add)
+        return RedirectResponse("/product_manager")
+    elif category == "Snack":
+         product_to_add = server.Snack("Snack",len(server.system.get_menu_list()+1),name,price,description,image_url)
+         system.add_menu(product_to_add)
+         return RedirectResponse("/product_manager")
+    else :
+        return n.show_toast("Wrong", "Category not found", duration = 10, icon_path ="/picture/logo.ico")
 serve()
