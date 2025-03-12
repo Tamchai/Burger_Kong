@@ -14,7 +14,14 @@ member = server.member
 # total_price = 00
 @rt('/view_cart/{current_user_id}', methods=["GET","POST"])
 def view_cart(current_user_id : int):
-    # global user_id
+    user = system.search_user_by_id(current_user_id)
+    if user is None:
+        return "Error: User not found", 404
+    
+    cart = user.get_cart()
+    if cart is None:
+        return "Error: Cart not found", 404
+    
     user = system.search_user_by_id(current_user_id)
     return Container(
         Div(
@@ -72,12 +79,18 @@ def view_cart(current_user_id : int):
                         Div(id="cart-items",
                             *[
                                 Div(
-                                Div(f"{item.get_menu().get_name()} x {item.get_quantity()} ", 
-                                    style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
+                                # Div(f"{item.get_menu().get_name()} x {item.get_quantity()} ", 
+                                #     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
                                 Div(f"{item} ", 
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),   
                                 Div(f"${item.get_total_price():.2f}",
-                                    Button("Remove", style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align: center; margin-left: 10px;"),
+                                    Button("Remove",
+                                            hx_delete=f"/delete_cart_item/{current_user_id}/{item.get_menu().get_id()}",
+                                           hx_target="#cart-items",
+                                           hx_swap="outerHTML",
+                                            type="submit",
+                                            action="/refresh",
+                                            style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align: center; margin-left: 10px;"),
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px; gap 50px; display: flex; justify-content: space-between; align-items: center;"),
                                 style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid rgba(80, 35, 20, 0.2); padding: 5px 0;"
                             ) 
@@ -86,7 +99,9 @@ def view_cart(current_user_id : int):
                         ),
                         Div(
                             H3("Discount:", style="color: #502314;"),
-                            H2(f"Total: ${user.get_cart().calculate_total_price():.2f}", id="total", style="color: #D00000; font-weight: bold; margin-top: 10px;"),  
+                            Div(
+    H2(f"Total: ${user.get_cart().calculate_total_price():.2f}", id="total", style="color: #D00000; font-weight: bold; margin-top: 10px;")
+),  
                             Div(
                                 Button("Checkout",style="font-size: 20px; font-weight: bold; background-color: #D00000; color: #ffffff; width: 50%; padding: 10px; border: none; display: block; margin: auto; border-radius: 10px;",onclick=f"window.location.href='/order_summary/{current_user_id}'"),
                                 action =f"/order_summary/{current_user_id}", method = "GET",
@@ -105,21 +120,29 @@ def view_cart(current_user_id : int):
 )
 
 
-# @rt('/cart/add/{id}')
-# def post(id: int):
-#     product = next((p for p in system._System__menu_list if p.get_id() == id), None)
-#     if not product:
-#         return "Product not found"
+@rt("/delete_cart_item/{current_user_id}/{item_id}", methods=["DELETE"])
+def delete_cart_item(current_user_id: int, item_id: int):
+    user = system.search_user_by_id(current_user_id)
+    if user is None:
+        return "Error: User not found", 404
     
-#     result = system.add_to_cart(member_id, product, 1, [])
-
-#     if result != "Success":
-#         return result
+    system.remove_from_cart(current_user_id, system.search_menu_by_id(item_id))
     
-#     cart_details = system.view_cart(member_id)
-    
-#     return Div(
-#         cart_details 
-#     )
+    cart = user.get_cart()
+    total_price = cart.calculate_total_price() if cart else 0.00
+    return Div(id="cart-items", *[
+        Div(
+            Div(f"{item} ", 
+                style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),   
+            Div(f"${item.get_total_price():.2f}",
+                Button("Remove",
+                       hx_delete=f"/delete_cart_item/{current_user_id}/{item.get_menu().get_id()}",
+                       hx_target="#cart-items",
+                       hx_swap="outerHTML",
+                       style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; margin-left: 10px;"),
+                style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px; display: flex; justify-content: space-between; align-items: center;"),
+            style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid rgba(80, 35, 20, 0.2); padding: 5px 0;"
+        ) for item in cart.get_item_list()                   
+    ]), H2(f"Total: ${total_price:.2f}", id="total", hx_swap_oob="innerHTML", style="color: #D00000; font-weight: bold; margin-top: 10px;")
 
 serve()

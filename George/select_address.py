@@ -9,7 +9,7 @@ member = server.member
 @app.get('/select_address/{current_user_id}', methods=["GET","POST"])
 def select_address(current_user_id:int):
     user = system.search_user_by_id(current_user_id)
-    address_list = user.get_address()
+    address_list = user.get_address_list()
     print(address_list)
     return Container(
         Div(
@@ -58,8 +58,8 @@ def select_address(current_user_id:int):
             H1("Select address", style="color: #502314; text-align: center; margin-top: 80px;"),
             *[Div(
                 Div(
-                    H3(address.get_address_name(), style="color: #502314; margin-bottom: 5px; text-align: left;"),
-                    P(address.get_address_detail(), style="color: #502314; font-size: 16px; text-align: left;"),
+                    H3(address.get_name(), style="color: #502314; margin-bottom: 5px; text-align: left;"),
+                    P(address.get_detail(), style="color: #502314; font-size: 16px; text-align: left;"),
                     Div(
                         Div(CheckboxX(checked=True), "Default",
                             style="font-weight: bold; color: #502314; font-size: 18px;"),

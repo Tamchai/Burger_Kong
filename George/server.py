@@ -28,7 +28,7 @@ class Member(User):
     def __init__(self, user_id,name, tel, password,lastname):
         super().__init__(user_id,name, tel, password)
         self.__order_list = []
-        self.__address = None
+        self.__address_list = []
         self.__payment = None
         self.__point = 0
         self.__coupon_list = []
@@ -46,41 +46,51 @@ class Member(User):
     def get_order_list(self):
         return self.__order_list
     
-    def add_to_cart(self, menu, quantity, addons=None,sizes=None):
+    def add_to_cart(self, menu, quantity, addons=None, sizes=None):
         if quantity <= 0:
             return "Error: Quantity must be a positive number."
 
-        # Check if the menu item supports add-ons (e.g., Burger) or not
-        if (isinstance(menu, Burger) or isinstance(menu,MenuSet)) and addons:
-            addons = tuple(sorted(addons))  # Sort to avoid treating different orderings as different
+        # For Burger or MenuSet: process addons
+        if (isinstance(menu, Burger) or isinstance(menu, MenuSet)) and addons:
+            addons = tuple(sorted(addons))
         else:
-            addons = tuple()  # No add-ons for non-Burger items or when no addons provided
+            addons = tuple()
 
+        # เริ่มคำนวณราคาโดยใช้ quantity
         total_price = menu.get_price() * quantity
         if isinstance(menu, Burger) and addons:
             for addon in addons:
                 if addon in menu.get_addons():
                     total_price += menu.get_addons()[addon] * quantity
-                    
-        if isinstance(menu, Beverage):
+        elif isinstance(menu, Beverage):
             size_price = {
-                "Small":1,
-                "Medium":1.5,
-                "Big":2
+                "Small": 1,
+                "Medium": 1.5,
+                "Big": 2
             }
-            if sizes in size_price:
-                total_price = (menu.get_price() * size_price[sizes]) 
-            
-            
-        
-        # Add the item to the cart, distinguishing by menu ID + add-ons
-        if isinstance(menu, Burger) :
+            # ใช้ multiplier จาก dictionary ถ้าไม่เจอให้ default เป็น 1
+            multiplier = size_price.get(sizes, 1)
+            total_price = menu.get_price() * multiplier * quantity
+
+        # เพิ่มสินค้าในตะกร้าตามประเภท
+        if isinstance(menu, Burger):
             self.__cart.add_item(menu, quantity, total_price, cart_addons=addons)
         elif isinstance(menu, Beverage):
             self.__cart.add_item(menu, quantity, total_price, cart_sizes=sizes)
         else:
             self.__cart.add_item(menu, quantity, total_price)
         return total_price
+            
+            
+        
+        # Add the item to the cart, distinguishing by menu ID + add-ons
+        # if isinstance(menu, Burger) :
+        #     self.__cart.add_item(menu, quantity, total_price, cart_addons=addons)
+        # elif isinstance(menu, Beverage):
+        #     self.__cart.add_item(menu, quantity, total_price, cart_sizes=sizes)
+        # else:
+        #     self.__cart.add_item(menu, quantity, total_price)
+        # return total_price
 
 
 
@@ -152,15 +162,14 @@ class Member(User):
 
         return f"Successfully exchanged {required_points} points for {selected_coupon.get_code()} ({selected_coupon.get_discount()}% discount)!"
     
-    def update_address(self, name, detail):
-        """Update or set the member's address"""
-        self.__address = Address(name, detail)
+    def add_address(self, name, detail):
+        new_address = Address(name, detail)
+        self.__address_list.append(new_address)
         return f"Address updated to: {name}, {detail}"
 
-    def get_address(self):
-        if self.__address:
-            return f"{self.__address._Address__name}: {self.__address._Address__detail}"
-        return "No address set."
+    def get_address_list(self):
+        return self.__address_list  # Return an empty list if no address exists
+
 
     def view_order_history(self):
         if not self.__order_list:
@@ -277,22 +286,21 @@ class Cart:
     #     new_item = CartItem(menu, quantity, total_price, addons)
     #     self.__item_list.append(new_item)
     #     return "Item added to cart."
-    def add_item(self, menu, quantity, total_price, cart_addons=None,cart_sizes=None):
-        # Ensure addons are a tuple for consistent comparison
-        cart_addons = tuple(sorted(cart_addons)) if cart_addons else tuple()  # Sort to handle ordering issues
-
-        # Check if the same menu with the same add-ons already exists
+    def add_item(self, menu, quantity, total_price, cart_addons=None, cart_sizes=None):
+        cart_addons = tuple(sorted(cart_addons)) if cart_addons else tuple()
+        # ตรวจสอบว่ามีสินค้าเดิมที่มี add-ons หรือ size เดียวกันอยู่แล้วหรือไม่
         for item in self.__item_list:
-            if item.get_menu() == menu and item.get_addons() == cart_addons:  # Correct access to __addons
-                item.update_quantity(quantity)  # Update quantity if the same item with the same addons exists
+            if (isinstance(menu, Burger) or isinstance(menu, MenuSet)) and item.get_menu() == menu and item.get_addons() == cart_addons:
+                item.update_quantity(quantity)
                 return "Item quantity updated in cart."
-            elif item.get_menu() == menu and item.get_sizes() == cart_sizes:
-                pass 
-        # If no existing item matches, create a new item
-        if isinstance(menu,Burger):
-            new_item = CartItem(menu, quantity, total_price, cart_item_addons = cart_addons)
-        elif isinstance(menu,Beverage):
-            new_item = CartItem(menu, quantity, total_price, cart_item_sizes =  cart_sizes)
+            elif isinstance(menu, Beverage) and item.get_menu() == menu and item.get_sizes() == cart_sizes:
+                item.update_quantity(quantity)
+                return "Item quantity updated in cart."
+        # ถ้าไม่มีรายการเดิม ให้สร้างรายการใหม่
+        if isinstance(menu, Burger):
+            new_item = CartItem(menu, quantity, total_price, cart_item_addons=cart_addons)
+        elif isinstance(menu, Beverage):
+            new_item = CartItem(menu, quantity, total_price, cart_item_sizes=cart_sizes)
         else:
             new_item = CartItem(menu, quantity, total_price)
         self.__item_list.append(new_item)
@@ -384,18 +392,21 @@ class CartItem:
             return f"{self.__menu.get_name()} x {self.__amount} - Total: ${self.__total_price:.2f}"
         
     def update_quantity(self, quantity):
-        """Updates the quantity of the cart item and recalculates total price."""
         self.__amount += quantity
-        self.__total_price = self.__menu.get_price() * self.__amount
-        if self.__addons:
-            for addon in self.__addons:
-                # Ensure the addon exists before updating the total price
-                if addon in self.__menu.get_addons():
-                    self.__total_price += self.__menu.get_addons()[addon] * self.__amount
-                else:
-                    print(f"Addon {addon} not found in the menu's addons.")
-
-
+        if isinstance(self.__menu, Beverage) and self.__sizes:
+            size_price = {
+                "Small": 1,
+                "Medium": 1.5,
+                "Big": 2
+            }
+            multiplier = size_price.get(self.__sizes, 1)
+            self.__total_price = self.__menu.get_price() * multiplier * self.__amount
+        else:
+            self.__total_price = self.__menu.get_price() * self.__amount
+            if self.__addons:
+                for addon in self.__addons:
+                    if addon in self.__menu.get_addons():
+                        self.__total_price += self.__menu.get_addons()[addon] * self.__amount
 
 class Order:
     def __init__(self, order_id, member,total_price,status="Pending"):
@@ -446,9 +457,11 @@ class Address:
     def __init__(self, name, detail):
         self.__name = name
         self.__detail = detail
-    
-    def update_address(self):
-        pass
+
+    def get_name(self):
+        return self.__name  
+    def get_detail(self):
+        return self.__detail
 
 class Payment:
     def __init__(self, payment_id, date, total_price, status, discount, payment_method):
@@ -656,7 +669,7 @@ def create_mockup_instances():
     system._System__user_list = [admin, member]
     
     # Assign an address to the member
-    member.update_address("Home", "123 Main Street, City, Country")  # ✅ Proper method call
+    member.add_address("Home", "123 Main Street, City, Country")  # ✅ Proper method call
     member2 = Member(3, "ss", "987654321", "ss","Doe")
     system.add_user_list(member2)
     
@@ -858,9 +871,9 @@ def testrun(system, member,admin):
         print(i)
     
         
-    print(member.get_address())  # Output: Home: 123 Main Street, City, Country  
-    print(member.update_address("Home", "gg"))
-    print(member.get_address())  # Output: Home: 123 Main Street, City, Country
+    print(member.get_address_list())  # Output: Home: 123 Main Street, City, Country  
+    print(member.add_address("Home", "gg"))
+    print(member.get_address_list())  # Output: Home: 123 Main Street, City, Country
 
     # View order history
     print(member.view_order_history())

@@ -5,10 +5,12 @@ from server import Member
 from server import Cart
 from server import CartItem 
 system = server.system 
-
+discount_amount = 0
 @rt('/order_summary/{current_user_id}', methods=["GET","POST"])
 def order_summary(current_user_id:int):
     user = system.search_user_by_id(current_user_id)
+    address_list = user.get_address_list()
+    global discount_amount
     return Container(
         Div(
             Div(
@@ -50,12 +52,12 @@ def order_summary(current_user_id:int):
                 box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
             """
         ),
-        Body(
+        Div(Form(Body(
             H1("Order Summary", style="color: #502314; text-align: center; padding: 10px;"),
             Div(
                 H3("Delivery to", style="color: #502314;"),
                 Select(
-                    children=[],
+                    *[Option(f"{address.get_name()+" "+address.get_detail()}", id = "coupon", name="coupon") for address in address_list],
                     style="""
                         background: #fff; 
                         border: 1px solid #ccc; 
@@ -115,7 +117,7 @@ def order_summary(current_user_id:int):
                         ),
                         Div(
                             H3("Discount:", style="color: #502314; display: inline-block;"),
-                            H3("0", style="color: #502314; float: right;"),
+                            H3(0, style="color: #502314; float: right;"),
                             style="width: 100%;"
                         ),
                         style="background: #f5ebdc; width: 100%;"
@@ -144,14 +146,15 @@ def order_summary(current_user_id:int):
                     Textarea(placeholder="Additional Message", style="background: #fff; width: 100%; height: 100px; margin-top: 5px; border: 1px solid #ccc; color: #000;"),
                     # Element ที่จะแสดงราคาทั้งหมดที่อัปเดตใหม่
                     H2("Total:0.00$", id="total", style="color: #D00000; font-weight: bold;"),
-                    Button("Checkout", style="background-color: #D00000; color: #ffffff; width: 100%; margin-top: 10px; padding: 10px; border: none;"),
+                    Button("Checkout", style="background-color: #D00000; color: #ffffff; width: 100%; margin-top: 10px; padding: 10px; border: none;",type = "submit"),
+                    action =f"/payment/{current_user_id}", method = "POST",
                     style="width: 50%; padding: 15px;"
                 ),
                 style="display: flex; justify-content: space-between; background: #f5ebdc; padding: 15px; border-radius: 30px; width: 60%; margin: auto; margin-top: 20px; border: 1px solid #502314;"
             ),
         
             style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 120px;"
-        ),
+        ))),
         Footer(
             Div(
                 H3("Contact Us", style="color: #fff; text-align: center; margin-bottom: 10px;"),
@@ -174,6 +177,7 @@ def order_summary(current_user_id:int):
 # Endpoint สำหรับคำนวณราคาทั้งหมดใหม่ เมื่อมีการเลือกคูปองลดราคา
 @app.post("/update_total")
 def update_total(coupon_discount: str = Form("0")):
+    global discount_amount
     # ใช้ current_user_id จาก server.current_user_id (หรือจะส่งผ่านฟอร์มก็ได้)
     current_user_id = server.current_user_id
     user = system.search_user_by_id(current_user_id)

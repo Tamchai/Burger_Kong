@@ -11,6 +11,7 @@ import coupon_member
 import view_cart
 import select_address
 import order_summary
+import payment
 
 if __name__ == "__routing__":
     rt.run()
