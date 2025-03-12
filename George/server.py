@@ -69,7 +69,7 @@ class Member(User):
                 "Big":2
             }
             if sizes in size_price:
-                total_price += (menu.get_price() * size_price[sizes]) 
+                total_price = (menu.get_price() * size_price[sizes]) 
             
             
         

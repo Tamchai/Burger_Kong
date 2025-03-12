@@ -74,6 +74,8 @@ def view_cart(current_user_id : int):
                                 Div(
                                 Div(f"{item.get_menu().get_name()} x {item.get_quantity()} ", 
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
+                                Div(f"{item} ", 
+                                    style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),   
                                 Div(f"${item.get_total_price():.2f}",
                                     Button("Remove", style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align: center; margin-left: 10px;"),
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px; gap 50px; display: flex; justify-content: space-between; align-items: center;"),
@@ -86,7 +88,8 @@ def view_cart(current_user_id : int):
                             H3("Discount:", style="color: #502314;"),
                             H2(f"Total: ${user.get_cart().calculate_total_price():.2f}", id="total", style="color: #D00000; font-weight: bold; margin-top: 10px;"),  
                             Div(
-                                Button("Checkout",style="font-size: 20px; font-weight: bold; background-color: #D00000; color: #ffffff; width: 50%; padding: 10px; border: none; display: block; margin: auto; border-radius: 10px;"),
+                                Button("Checkout",style="font-size: 20px; font-weight: bold; background-color: #D00000; color: #ffffff; width: 50%; padding: 10px; border: none; display: block; margin: auto; border-radius: 10px;",onclick=f"window.location.href='/order_summary/{current_user_id}'"),
+                                action =f"/order_summary/{current_user_id}", method = "GET",
                                 style="width: 100%; display: flex; justify-content: center; margin-top: 15px;"
                             ),
                             style="display: flex; flex-direction: column; width: 100%; padding-top: 15px; margin-top: auto;"

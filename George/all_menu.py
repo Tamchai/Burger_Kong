@@ -95,7 +95,7 @@ def home():
     user_id = server.current_user_id
     count = 1
     print(user_id)
-    return Title("Burger Kong"),Container(
+    return Title("Burge Kong"),Container(
         Div(
             Div(
                 Div(
@@ -274,12 +274,11 @@ def detail(menu_id: int):
                                 Label(CheckboxX(id="More_Patty", name="More_Patty", value="More_Patty", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"More Patty +1$" , style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="Bacon", name="Bacon", value="Bacon",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Bacon +0.75$" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="More_Cheese", name="More_Cheese", value="More_Cheese", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "More Cheese +0.5$", style="color: #502314; font-size: 18px; font-weight: bold;")
-                            ) )if menu.get_category() == "Burger" else (),
-                            (Div(
-                                Label(CheckboxX(id="Small", name="More_Patty", value="More_Patty", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"Small" , style="color: #502314; font-size: 18px; font-weight: bold;"),
-                                Label(CheckboxX(id="Medium", name="Bacon", value="Bacon",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Medium" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
-                                Label(CheckboxX(id="big", name="More_Cheese", value="More_Cheese", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "Large", style="color: #502314; font-size: 18px; font-weight: bold;")
-                            ) )if menu.get_category() == "Beverage" else (),
+                            ) )if menu.get_category() == "Burger" or menu.get_category()=="Snack" else (),
+                            ((  Label(CheckboxX(id="Small", name="size", value="Small", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"Small" , style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(CheckboxX(id="Medium", name="size", value="Medium",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Medium" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(CheckboxX(id="Big", name="size", value="Big", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "Big", style="color: #502314; font-size: 18px; font-weight: bold;") 
+                                ) if menu.get_category() == "Beverage" else (), )if menu.get_category() == "Beverage" else (),
                             Hr(style="border: 1px solid #000; opacity: 0.5;"),
                             Div(
                                 Span("Quantity", Class="section-title", style="color: #502314; font-size: 22px; font-weight: bold;"),
@@ -363,21 +362,57 @@ def detail(menu_id: int):
         )
     )
 
-# add to cart and send total price of menu 
 @rt('/save/{menu_id}', methods=['POST'])
-def post(More_Patty:str,Bacon:str,More_Cheese:str,count:int,menu_id : int):
+def post( menu_id: int, count: int = Form(1),More_Patty: Optional[str] = Form(None), Bacon: Optional[str] = Form(None), More_Cheese: Optional[str] = Form(None), size: Optional[str] = Form(None)):
     global current_user_id
-    menu_id = system.select_menu(menu_id)
-    
-#     File "c:\Users\photc\Desktop\George\all_menu.py", line 357, in post
-#     system.add_to_cart(server.current_user_id,menu_id,count,[More_Patty,Bacon,More_Cheese])
-#   File "c:\Users\photc\Desktop\George\server.py", line 563, in add_to_cart
-#     return member.add_to_cart(menu_item, quantity, addons)
-#            ^^^^^^^^^^^^^^^^^^
-# AttributeError: 'NoneType' object has no attribute 'add_to_cart'
-    system.add_to_cart(server.current_user_id,menu_id,count,[More_Patty,Bacon,More_Cheese])
+    menu_item = system.select_menu(menu_id)
+
+    if isinstance(menu_item, Burger):
+        # If the add-ons are not checked, their value will be None.
+        print(f"Add-ons: More Patty = {More_Patty}, Bacon = {Bacon}, More Cheese = {More_Cheese}")
+        # Only pass add-ons if they are selected
+        add_ons = [More_Patty, Bacon, More_Cheese]
+        # Filter out None values
+        add_ons = [addon for addon in add_ons if addon is not None]
+        system.add_to_cart(server.current_user_id, menu_item, count, add_ons)
+
+    elif isinstance(menu_item, Beverage):
+        print(f"Size: {size}")
+        # print()
+        if size:
+            system.add_to_cart(server.current_user_id, menu_item, count, size = size)
+            
+        else:
+            return "Size is required for beverages."
+
+    else:
+        return "Invalid menu item"
+    size = None
     count = 1
     return RedirectResponse("/home")
+
+
+# add to cart and send total price of menu 
+# @rt('/save/{menu_id}', methods=['POST'])
+# def post(More_Patty = None, Bacon =None, More_Cheese = None, count=None, menu_id=None, size = None):
+#     global current_user_id
+#     menu_id = system.select_menu(menu_id)
+#     print(menu_id)
+#     if isinstance(menu_id, Burger):
+#         RedirectResponse("/home")
+#         print(f"Add-ons: More Patty = {More_Patty}, Bacon = {Bacon}, More Cheese = {More_Cheese}")
+#         system.add_to_cart(server.current_user_id, menu_id, count, [More_Patty, Bacon, More_Cheese])
+#     elif isinstance(menu_id, Beverage):
+#         RedirectResponse("/")
+#         # print(f"Size: {size}")
+#         system.add_to_cart(server.current_user_id, menu_id, count, size)
+       
+#     else:
+#         RedirectResponse("/coupon_member")
+#         # system.add_to_cart(server.current_user_id, menu_id, count)
+
+#     count = 1
+#     return RedirectResponse("/home")
 
 @app.post("/increment")
 def increment():
@@ -416,5 +451,33 @@ async def update_price(
     if More_Cheese:
         total_price += 0.5 * count
     return f"Price - {total_price:.2f}$"
+
+# @rt('/save/burger/{menu_id}', methods=['POST'])
+# def post_burger(More_Patty: str, Bacon: str, More_Cheese: str, count: int, menu_id: int):
+#     global current_user_id
+#     menu_id = system.select_menu(menu_id)
+
+#     if isinstance(menu_id, Burger):
+#         print(f"Add-ons: More Patty = {More_Patty}, Bacon = {Bacon}, More Cheese = {More_Cheese}")
+#         system.add_to_cart(server.current_user_id, menu_id, count, [More_Patty, Bacon, More_Cheese])
+#     else:
+#         return "Invalid menu item"
+
+#     count = 1
+#     return RedirectResponse("/home")
+
+# @rt('/save/beverage/{menu_id}', methods=['POST'])
+# def post_beverage( count: int, menu_id: int,size: Optional[str] = Form(None)):
+#     global current_user_id
+#     menu_id = system.select_menu(menu_id)
+
+#     if isinstance(menu_id, Beverage):
+#         print(f"Size: {size}")
+#         system.add_to_cart(server.current_user_id, menu_id, count, size)
+#     else:
+#         return "Invalid menu item"
+
+#     count = 1
+#     return RedirectResponse("/home")
 
 serve()

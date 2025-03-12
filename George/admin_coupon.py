@@ -162,6 +162,12 @@ def delete(name: str):
         ]
     ), id="product-list")
 
-
+@rt("/delete/{name}")
+def delete(name: str):
+    global coupon_list
+    coupon_list = [p for p in coupon_list if p.get_name() != name]
+    response = Response(status_code=200)
+    response.headers["HX-Redirect"] = "/coupon_manager"
+    return response
 
 serve()

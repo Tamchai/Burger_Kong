@@ -10,6 +10,7 @@ import admin_view_member_order
 import coupon_member
 import view_cart
 import select_address
+import order_summary
 
 if __name__ == "__routing__":
     rt.run()

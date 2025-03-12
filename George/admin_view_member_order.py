@@ -37,11 +37,6 @@ def get():
                         *[(
                                 Div(
                                     H2(member.get_name(), style="color: #502314;"),
-                                    Button(
-                                        "Delete",
-                                        style="background: #D00000; color: white; padding: 5px 10px; border-radius: 10px; border: 1px solid #502314; cursor: pointer;",
-                                        **{"hx-get": "/manage_order", "hx-target": "#order-section"}
-                                    ),
                                     style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
                                 ),
                                 Div(

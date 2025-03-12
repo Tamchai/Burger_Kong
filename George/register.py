@@ -215,10 +215,14 @@ def send_user_id():
 
 @app.get('/login')
 def login(username: str, password: str):
-    global user_id
-    status, user = system.check_password(username, password)
+    result = system.check_password(username, password)
+
+    if isinstance(result, tuple):
+        status, user = result
+    else:
+        status, user = result, None
     if not status:
-        return RedirectResponse("/" ,status_code=401)
+        return RedirectResponse("/" )
     if isinstance(user, Admin):
         return RedirectResponse("/admin")
     else:

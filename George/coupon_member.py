@@ -7,9 +7,9 @@ system = server.system
 
 # user_points = 1500
 
-@app.get('/coupon_member/{current_user_id}')
+@rt('/coupon_member/{current_user_id}',methods=["GET","POST"])
 def coupon_member(current_user_id : int):
-    # global user_id
+    coupon_list = system.get_coupon_list()
     user = system.search_user_by_id(current_user_id)
     return Container(
         Div(
@@ -72,16 +72,79 @@ def coupon_member(current_user_id : int):
                         """),                    
                     style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
                     ),
-                Div(id="cart-items",
-                    style="flex-grow: 1; width: 100%;"
+                    Table(
+                        Thead(
+                            Tr(
+                                Th("Coupon Code", style="font-weight: bold; font-size: 24px; text-align: center; background: none; color: #502314; padding: 10px; border: 1px none;"),
+                                Th("Discount", style="font-weight: bold; font-size: 24px; text-align: center; background: none; color: #502314; padding: 10px; border: 1px none;"),
+                                Th("Expire", style="font-weight: bold; font-size: 24px; text-align: center; background: none; color: #502314; padding: 10px; border: 1px none;"),
+                                Th("Action", style="font-weight: bold; font-size: 24px; text-align: center; background: none; color: #502314; padding: 10px; border: 1px none;")
+                            )
+                        ),
+                        Tbody( 
+                            *[
+                                Tr(
+                                    Td(coupon.get_name(),style="font-weight: normal; font-size: 18px; color: #502314; background: #f5ebdc; padding: 8px; border: 1px none; text-align: center;"),
+                                    Td(coupon.get_discount(),style="font-weight: normal; font-size: 18px; color: #502314; background: #f5ebdc; padding: 8px; border: 1px none; text-align: center;"),
+                                    Td(coupon.get_expire_date(),style="font-weight: normal; font-size: 18px; color: #502314; background: #f5ebdc; padding: 8px; border: 1px none; text-align: center;"),
+                                    Td(
+                                Button("Exchange",
+                                    hx_delete=f"/use_coupon/{current_user_id}/{coupon.get_name()}",  # ✅ Use hx_delete for proper HTTP semantics
+                                    hx_target=f"result",  # ✅ Targets the table body
+                                    hx_swap="outerHTML",  # ✅ Replaces only the table body, not the full page
+                                    style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
+                                ),method = "POST",
+                                style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
+                            ),id = "result"
+                                )
+                                for coupon in coupon_list
+                            ]
+                        ),
+                        style="""
+                            background: #f5ebdc; 
+                            border: 2px none;
+                            width: 100%; 
+                            margin: auto; 
+                            text-align: center; 
+                            position: relative; 
+                            margin-top: 20px;
+                        """
+                    ),
+                style="display: flex; flex-direction: column; background: #f5ebdc; padding: 20px; border-radius: 30px; width: 75%; height: 90vh; margin: auto; border: 1px solid #502314;"
                 ),
-                style="display: flex; flex-direction: column; width: 100%; height: 100%; flex-grow: 1;"
             ),
-            style="display: flex; flex-direction: column; background: #f5ebdc; padding: 20px; border-radius: 30px; width: 75%; height: 90vh; margin: auto; border: 1px solid #502314;"
-        ),
-
-        style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+            style="margin-top: 3%;background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+        )
     )
-)
+
+@rt('/use_coupon/{current_user_id}/{coupon_name}', methods=["GET", "POST"])
+def use_coupon(current_user_id: int, coupon_name: str):
+    user = system.search_user_by_id(current_user_id)
+
+# Remove coupon from the user's list and deduct points
+    if user.remove_coupon(coupon_name):
+        # Assuming a coupon gives some discount, you can adjust the point deduction
+        coupon = system.get_coupon_list().get(coupon_name)  # Find the coupon by name
+        points_deducted = coupon.get_discount() * 10  # Example logic to convert discount to points
+        user.add_point(-points_deducted)  # Deduct points
+
+    return Div(Tbody(
+        *[
+            Tr(
+                Td(coupon.get_name(), style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                Td(f"{coupon.get_discount()}%", style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                Td(coupon.get_expire_date(), style="color:#502314; background: #fff8f0; padding: 8px; border: 1px solid #502314;"),
+                Td(
+                    Button("Exchange",
+                        hx_delete=f"/use_coupon/{current_user_id}/{coupon.get_name()}",
+                        hx_target="#product-list",
+                        hx_swap="outerHTML",
+                        style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
+                    ),
+                    style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
+                )
+            ) for coupon in user.get_coupon()  # Loop through the user's coupons
+        ]
+    ), id="product-list")
 
 serve()
