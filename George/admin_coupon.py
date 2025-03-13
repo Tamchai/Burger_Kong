@@ -133,7 +133,7 @@ def add_coupon(name:str,percent:int,expiration:str):
     else :
         for coupon in coupon_list:
             if coupon.get_name() == name or percent > 100 :
-                return n.show_toast("Wrong", "Coupon name already exist", duration = 10, icon_path ="/picture/logo.ico")
+                return n.show_toast("Wrong", "Coupon name already exist or over 100%", duration = 10, icon_path ="/picture/logo.ico")
             else :
                 coupon_to_add = server.Coupon(name,percent,expiration)
                 coupon_list.append(coupon_to_add)

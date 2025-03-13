@@ -9,46 +9,45 @@ from server import CreditCard
 from server import QRCode
 from server import Payment
 import order_summary
+from win10toast import ToastNotifier
+n = ToastNotifier()
 @rt("/payment/{current_user_id}/{total_price}/{order_id}", methods=["GET", "POST"])
 def get(current_user_id:  int,total_price: float, order_id:int ):
-    # target_order = ''
-    # member = system.search_user_by_id(current_user_id)
-    # order_user_list = member.get_order_list()
-    # for order in order_user_list:
-    #     if order.get_id() == order_id:
-    #         target_order = order
-    # print(target_order)
-            
-            
-    
     return Container(
         Div(
             Div(
                 Div(
-                    Img(src="https://i.imgur.com/fCpADUO.png", 
-                        style="width: 55px; height: auto; margin: 0px;"
+                    Form(Button(
+                        Img(src="https://i.imgur.com/fCpADUO.png", style="width: 50px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;",type="submit"),
+                            action = "/home",method = "GET"
                     ),
                     H2("Burger Kong", style="color: #502314; margin: 0;"),
                     style="display: flex; align-items: center; gap: 10px;"
                 ),
                 Div(
-                    Img(src="https://i.imgur.com/Xyhfm0Q.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/AcIDazc.png",
-                        style="width: 40px; height: auto; margin-right: 15px;"),
-                    Img(src="https://i.imgur.com/Kj7efMN.png",
-                        style="width: 40px; height: auto; margin-right: 10px;"),
-                    Img(src="https://i.imgur.com/2eQjSEg.png",
-                        style="width: 40px; height: auto; margin-right: 20px;"),
-                    style="color: #502314; font-size: 20px; font-weight: bold; display: flex; justify-content: flex-end; align-items: center;"
-                ),
+                        Form(
+                            Button(
+                            Img(src="https://i.imgur.com/SwkvgTW.png",style="width: 40px; height: auto; margin-right: 15px;"),
+                            style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/select_address/{current_user_id}", method = "GET"),
+                        Form(Button(
+                        Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"####/{current_user_id}", method = "GET"),
+                        Form(Button(
+                            Img(src="https://i.imgur.com/JZR6dA6.png", style="width: 45px; height: auto;"),
+                                style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/coupon_member/{current_user_id}", method = "GET"),
+                        Form(Button(
+                            Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 45px; height: auto;"),
+                                style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/view_cart/{current_user_id}", method = "POST"),
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;"
+                    ),
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
             ),
-            style=""" 
+            style="""
                 width: 100%; 
                 background: #f5ebdc; 
                 padding: 15px; 
-                border-bottom: 2px solid #502314; 
+                border-bottom: 2px solid #502314;
                 position: fixed; 
                 top: 0; 
                 left: 0; 
@@ -63,12 +62,12 @@ def get(current_user_id:  int,total_price: float, order_id:int ):
                 Form(
                     Group(
                         Div(
-                            Label("ชื่อ",style="color: #502314; font-size: 18px; font-weight: bold;"),
+                            Label("Name",style="color: #502314; font-size: 18px; font-weight: bold;"),
                             Input(type="text", id="name", style="color: #000; background: #fff; padding: 8px; border-radius: 15px; border: 1px solid #502314;", requied = True),
                             style="display: flex; flex-direction: column; gap: 5px; width: auto; "
                         ),
                         Div(
-                            Label("เบอร์โทรศัพท์มือถือ",style="color: #502314; font-size: 18px; font-weight: bold;"),
+                            Label("Phone Number",style="color: #502314; font-size: 18px; font-weight: bold;"),
                             Input(type="text", id="tel", style="color: #000; background: #fff;padding: 8px; border-radius: 15px; border: 1px solid #502314;", requied = True),
                             style="display: flex; flex-direction: column; gap: 5px; width: auto;"
                         ),
@@ -77,14 +76,14 @@ def get(current_user_id:  int,total_price: float, order_id:int ):
                     H3("เลือกวิธีการชำระเงิน", style="font-size: 24px; color: #502314; margin-top: 20px;"),
                     Group(
                         Div(
-                            Label("บัตรเครดิต/เดบิต", style="color: #502314; font-size: 18px; font-weight: bold;"),
+                            Label("Credit/Debit", style="color: #502314; font-size: 18px; font-weight: bold;"),
                             Input(type="radio", id="credit", name="payment", value="CREDIT", style="background:#fff; margin-left: 5px;", requied = True),
                             style="display: flex; flex-direction: column; gap: 5px; width: auto;"
                         ),  
                             Div( 
-                                        Label("หมายเลขบัตรเครดิต", style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                        Label("Credit Card Number", style="color: #502314; font-size: 18px; font-weight: bold;"),
                                         Input(type="text", id="card-number", placeholder="1234 5678 1234 5678", style="color: #502314;background: #fff; padding: 8px; border-radius: 15px; border: 1px solid #502314;", requied = True),
-                                        Label("วันหมดอายุ", style="color: #502314; font-size: 18px; font-weight: bold;", requied = True), 
+                                        Label("Expiredate", style="color: #502314; font-size: 18px; font-weight: bold;", requied = True), 
                                         Input(type="text", id="expiry-date", placeholder="MM/YY", style="color: #502314;background: #fff; padding: 8px; border-radius: 15px; border: 1px solid #502314;"),
                                         Label("CVV", style="color: #502314; font-size: 18px; font-weight: bold;", requied = True),
                                         Input(type="text", id="cvv", placeholder="123", style="color: #502314;background: #fff; padding: 8px; border-radius: 15px; border: 1px solid #502314;"), 
@@ -97,7 +96,7 @@ def get(current_user_id:  int,total_price: float, order_id:int ):
                             style="display: flex; flex-direction: column; gap: 5px; width: auto;"
                         ),
                          Div(
-                        Label("เลือกประเภท QRCODE", style="display: none;color: #502314; font-size: 18px; font-weight: bold;"),
+                        Label("Choose QRCODE", style="display: none;color: #502314; font-size: 18px; font-weight: bold;"),
                        
                            Img(src="https://i.imgur.com/6uY8X50.jpeg",
                             id="qrcode-options",
@@ -109,10 +108,10 @@ def get(current_user_id:  int,total_price: float, order_id:int ):
                     ),
                 Div(
                     Label(Strong(f"Total: {total_price}"), 
-                    Span("...", id="total_price", hx_get="/total_price", hx_trigger="load"),"$",
+                    Span( id="total_price", hx_get="/total_price", hx_trigger="load"),"$",
                         style="font-size: 24px; text-align: center; color: #502314;")
                     ),
-                Button("สั่งอาหาร", type="submit", style="background: #502314; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; margin-top: 20px;"),
+                Button("Let's Order", type="submit", style="background: #502314; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; margin-top: 20px;"),
                     method="GET",
                     action=f"/submit/{current_user_id}/{order_id}",
                     style="max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);"
@@ -162,6 +161,10 @@ def get(current_user_id:int,order_id:int,name: str, tel: str, payment: str, card
     if payment == "CREDIT" and not (card_number and expiry_date and cvv):
         credit_card = CreditCard(card_number, expiry_date, cvv)
         system.pay_order(current_user_id,orders, credit_card)
-        return "Success",RedirectResponse("/home")
-
+        n.show_toast("Suscess", "pyment with Credit Card Comfirmed")
+    else:
+        qrcode = QRCode(qr_code_data=True)
+        system.pay_order(current_user_id,orders, qrcode)
+        n.show_toast("Suscess", "pyment with QRCODE Comfirmed")
+    return RedirectResponse("/home")
 serve()

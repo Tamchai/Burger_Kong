@@ -693,31 +693,41 @@ def create_mockup_instances():
 
     drink = Beverage("Beverage", 200, "Water", 1.99, "Refreshing drink",  "/picture/Beverage/Bottled-Water.png")
     drink2 = Beverage("Beverage", 201, "Refill Coke", 3.99, "Refill COCACOLA",  "/picture/Beverage/cola.png")
-    drink3 = Beverage("Beverage", 202, "Lemon Juice Lemonade", 1.99, "Refreshing drink",  "/picture/Beverage/Lemon-juice-Lemonade.png")
-    drink4 = Beverage("Beverage", 203, "Orange Juice", 3.99, "Refill COCACOLA",  "/picture/Beverage/Orange-juice.png")
-    drink5 = Beverage("Beverage", 204, "Coke", 1.99, "Refreshing drink",  "/picture/Beverage/cola.png")
-    drink6 = Beverage("Beverage", 205, "Strawberry Juice", 3.99, "Refill COCACOLA", "/picture/Beverage/strawberry-juice.png")
+    drink3 = Beverage("Beverage", 202, "Lemon Juice Lemonade", 1.99, "LEMONADE",  "/picture/Beverage/Lemon-juice-Lemonade.png")
+    drink4 = Beverage("Beverage", 203, "Orange Juice", 3.99, "Orange fresh",  "/picture/Beverage/Orange-juice.png")
+    drink5 = Beverage("Beverage", 204, "Coke", 1.99, "COCACOLAAAA",  "/picture/Beverage/cola.png")
+    drink6 = Beverage("Beverage", 205, "Strawberry Juice", 3.99, " Strawberry Juice - Fresh & Refreshing ", "/picture/Beverage/strawberry-juice.png")
     
-    menu_set = MenuSet("Combo Set", 300, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/Combo Set/Cheese Overload Set.png")
-    menu_set2 = MenuSet("Combo Set", 301, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/Combo Set/Chicken-Chicken-Cheese-Set.png")
-    menu_set3 = MenuSet("Combo Set", 302, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/Combo Set/Classic Whopper Meal.png")
-    menu_set4 = MenuSet("Combo Set", 303, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/Combo Set/Double Cheese Overload Set.png")
-    menu_set5 = MenuSet("Combo Set", 304, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/Combo Set/Mega Stack Bundle.png")
-    menu_set6 = MenuSet("Combo Set", 305, "Burger Combo", 9.99, "Burger with fries and drink", "/picture/Combo Set/Whopper and Cheese Burger Set.png")
+    menu_set = MenuSet("Combo Set", 300, "Burger Combo", 10.10, "Cheese Overload Set", "/picture/Combo Set/Cheese Overload Set.png")
+    menu_set2 = MenuSet("Combo Set", 301, "Burger Combo", 9.99, "Chicken-Chicken-Cheese-Set", "/picture/Combo Set/Chicken-Chicken-Cheese-Set.png")
+    menu_set3 = MenuSet("Combo Set", 302, "Burger Combo", 13.06, "Classic Whopper Meal", "/picture/Combo Set/Classic Whopper Meal.png")
+    menu_set4 = MenuSet("Combo Set", 303, "Burger Combo", 15.26, "Double Cheese Overload Set", "/picture/Combo Set/Double Cheese Overload Set.png")
+    menu_set5 = MenuSet("Combo Set", 304, "Burger Combo", 10.59, "Mega Stack Bundle", "/picture/Combo Set/Mega Stack Bundle.png")
+    menu_set6 = MenuSet("Combo Set", 305, "Burger Combo", 8.99, "Whopper and Cheese Burger Set", "/picture/Combo Set/Whopper and Cheese Burger Set.png")
 
     coupon1 = Coupon("DISCOUNT40", 40, "2025-12-31")
-    coupon2 = Coupon("DISCOUNT30", 30, "2025-12-31")
-    coupon3 = Coupon("DISCOUNT20", 20, "2025-12-31")
+    coupon2 = Coupon("DISCOUNT35", 35, "2025-12-31")
+    coupon3 = Coupon("DISCOUNT25", 25, "2025-12-31")
+    coupon4 = Coupon("DISCOUNT45", 45, "2025-12-31")
+    coupon5 = Coupon("DISCOUNT12", 10, "2025-12-31")
+    coupon6= Coupon("DISCOUNT15", 15, "2025-12-31")
+    coupon7 = Coupon("DISCOUNT37", 37, "2025-12-31")
+    coupon8 = Coupon("DISCOUNT8", 8, "2025-12-31")
+    coupon9 = Coupon("DISCOUNT9", 9, "2025-12-31")
+    coupon10 = Coupon("DISCOUNT19", 19, "2025-12-31")
+    coupon11 = Coupon("DISCOUNT47", 47, "2025-12-31")
+    coupon12 = Coupon("DISCOUNT6", 6, "2025-12-31")
 
-    system.add_coupon(coupon1)
-    system.add_coupon(coupon2)
-    system.add_coupon(coupon3)
-    
+    for i in [coupon1, coupon2,coupon3,coupon4,coupon5,coupon6,coupon7,coupon8,coupon9,coupon10,coupon11,coupon12]:
+        system.add_coupon(i)
+    for i in [coupon1, coupon2,coupon3,coupon4,coupon5,coupon6,coupon7,coupon8,coupon9,coupon10,coupon11,coupon12]:
+        member.add_coupon_to_list(i)
+        
     menu_set.add_menu_item = [burger, drink, snack]
     member.add_coupon_to_list(Coupon("DISCOUNT10", 10, "2025-12-31"))
-    member.add_coupon_to_list(coupon2)
-    member.add_coupon_to_list(coupon1)
-    member.add_coupon_to_list(coupon3)
+    # member.add_coupon_to_list(coupon2)
+    # member.add_coupon_to_list(coupon1)
+    # member.add_coupon_to_list(coupon3)
     for i in [burger, burger2, burger3, burger4,burger5, burger6, burger7, burger8,  snack, snack2, snack3, snack4, snack5, snack6, menu_set, menu_set2, menu_set3, menu_set4, menu_set5, menu_set6, drink, drink2, drink3, drink4, drink5, drink6]:
         system.add_menu(i) 
     for i in system.get_menu_list():

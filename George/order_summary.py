@@ -124,11 +124,6 @@ def order_summary(current_user_id: int):
                                     H3("$2", style="color: #502314;  flex: 1; text-align: right;"),
                                     style="display: flex; justify-content: space-between; width: 100%;"
                                 ),
-                                Div(
-                                    H3("Discount:", style="color: #502314; width: 150px; text-align: left;"),
-                                    H3(f"${discount_amount:.2f}", style="color: #502314;  flex: 1; text-align: right;"),
-                                    style="display: flex; justify-content: space-between; width: 100%;"
-                                ),
                                 style="""
                                     background: #f5ebdc; 
                                     padding: 15px; 
@@ -142,7 +137,7 @@ def order_summary(current_user_id: int):
                             )
                         ),
                         H3("Coupon Discount", style="color: #502314; margin-top: 15px;text-align: left;"),
-                        Select(
+                        Select(Option(),
                             *[Option(f"{coupon.get_name()} - {coupon.get_discount()}%", value=coupon.get_name()) for coupon in system.get_coupon_list()],
                             name="coupon_discount",
                             id="coupon_discount",

@@ -268,18 +268,22 @@ def detail(menu_id: int):
                         style="width: 50%; display: flex; flex-direction: column; align-items: left; padding: 20px;"
                     ),
                     Div(
-                        H4("Add on", Class="section-title", style="color: #502314; font-size: 24px; font-weight: bold; "),                            
+                        H4("Add on", Class="section-title", style="color: #502314; font-size: 24px; font-weight: bold; "), 
                         Form(
+                            # Show add-ons for Burger or Beverage
                             (Div(
                                 Label(CheckboxX(id="More_Patty", name="More_Patty", value="More_Patty", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"More Patty +1$" , style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="Bacon", name="Bacon", value="Bacon",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Bacon +0.75$" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="More_Cheese", name="More_Cheese", value="More_Cheese", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "More Cheese +0.5$", style="color: #502314; font-size: 18px; font-weight: bold;")
-                            ) )if menu.get_category() == "Burger" or menu.get_category()=="Snack" else (),
-                            ((  Label(CheckboxX(id="Small", name="size", value="Small", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"Small" , style="color: #502314; font-size: 18px; font-weight: bold;"),
-                                Label(CheckboxX(id="Medium", name="size", value="Medium",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Medium" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
-                                Label(CheckboxX(id="Big", name="size", value="Big", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "Big", style="color: #502314; font-size: 18px; font-weight: bold;") 
-                                ) if menu.get_category() == "Beverage" else (), )if menu.get_category() == "Beverage" else (),
-                            Hr(style="border: 1px solid #000; opacity: 0.5;"),
+                            )) if menu.get_category() == "Burger" else (
+                            # Show size options for Beverages
+                            (Label(Input(type = "radio",id="Small", name="size", value="Small", hx_post="/update_price", hx_trigger="change",hx_target="#price"  , hx_swap="innerHTML" ), "Small" , style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(Input(type = "radio",id="Medium", name="size", value="Medium",hx_post="/update_price",hx_trigger="change" , hx_target="#price" , hx_swap="innerHTML"), "Medium" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
+                                Label(Input(type = "radio",id="Big", name="size", value="Big", hx_post="/update_price", hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "Big", style="color: #502314; font-size: 18px; font-weight: bold;")) if menu.get_category() == "Beverage" else (
+                            # For Snack or Combo Set, don't show add-ons or size options
+                            ()),
+                            Hr(style="border: 1px solid #000; opacity: 0.5;")
+                            ),
                             Div(
                                 Span("Quantity", Class="section-title", style="color: #502314; font-size: 22px; font-weight: bold;"),
                                 Div(
@@ -386,7 +390,7 @@ def post( menu_id: int, count: int = Form(1),More_Patty: Optional[str] = Form(No
             return "Size is required for beverages."
 
     else:
-        return "Invalid menu item"
+        system.add_to_cart(server.current_user_id, menu_item, count)
     size = None
     count = 1
     return RedirectResponse("/home")
@@ -440,17 +444,41 @@ async def update_price(
     More_Patty: Optional[str] = Form(None),
     Bacon: Optional[str] = Form(None),
     More_Cheese: Optional[str] = Form(None),
+    size: Optional[str] = Form(None),
     count: int = Form(1)
-):  
+):
     global base_price
-    total_price = base_price * count  
-    if More_Patty:
-        total_price += 1.0 * count
-    if Bacon:
-        total_price += 0.75 * count
-    if More_Cheese:
-        total_price += 0.5 * count
+
+    # Calculate the base price for the selected size (if applicable)
+    size_price = 1
+    print(size)
+    
+    if size == "Small":
+        size_price = 1  # Small might have the base price (no increase)
+    elif size == "Medium":
+        
+        size_price = 1.5  # Example: Medium costs +1$
+    elif size == "Big":
+        size_price = 2.0  # Example: Big costs +2$
+    
+    # Calculate the total price based on the base price, add-ons, size, and quantity
+    total_price = (base_price*size_price) * count  # Add size price for quantity
+
+    # Add the price for selected add-ons
+    
+    if More_Patty == "More_Patty":
+        total_price += 1.0 * count  # More Patty costs +1$ per count
+        print("More Patty selected")
+    if Bacon == "Bacon":
+        total_price += 0.75 * count  # Bacon costs +0.75$ per count
+        print("Bacon selected")
+    if More_Cheese == "More_Cheese":
+        total_price += 0.5 * count  # More Cheese costs +0.5$ per count
+        print("More Cheese selected")
+
+    # Return the updated price
     return f"Price - {total_price:.2f}$"
+
 
 # @rt('/save/burger/{menu_id}', methods=['POST'])
 # def post_burger(More_Patty: str, Bacon: str, More_Cheese: str, count: int, menu_id: int):
