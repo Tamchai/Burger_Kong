@@ -119,7 +119,6 @@ def view_cart(current_user_id : int):
         )
 )
 
-
 @rt("/delete_cart_item/{current_user_id}/{item_id}", methods=["DELETE"])
 def delete_cart_item(current_user_id: int, item_id: int):
     user = system.search_user_by_id(current_user_id)

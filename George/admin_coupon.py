@@ -8,12 +8,7 @@ system = server.system
 # app, rt = fast_app(live=True)
 coupon_list = system.get_coupon_list()
 # import win10toast
-
-
-# create an object to ToastNotifier class
 n = ToastNotifier()
-
-
 
 @rt('/coupon_manager', methods=["GET","POST"])
 def coupon_manager():
@@ -152,7 +147,7 @@ def delete(name: str):
                 Td(
                     Button("Delete",
                         hx_delete=f"/delete/{p.get_name()}",
-                        hx_target="#product-list",  # Updated target to the container of the coupon list
+                        hx_target="#product-list", 
                         hx_swap="outerHTML",
                         style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
                     ),

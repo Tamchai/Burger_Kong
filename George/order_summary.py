@@ -5,12 +5,12 @@ from server import Member, Cart, CartItem
 import payment
 
 system = server.system
-discount_amount = 0  # Global discount tracking
+discount_amount = 0  
 
 @rt('/order_summary/{current_user_id}', methods=["GET", "POST"])
 def order_summary(current_user_id: int):
     """Displays the order summary page."""
-    print(f"Loading Order Summary for user: {current_user_id}")  # Debugging
+    print(f"Loading Order Summary for user: {current_user_id}") 
 
     user = system.search_user_by_id(current_user_id)
     if not user:
@@ -21,7 +21,6 @@ def order_summary(current_user_id: int):
     address_list = user.get_address_list()
     global discount_amount
 
-    # Calculate total including discount
     total_price = cart.calculate_total_price() + 2 - discount_amount
     return Container(
         Div(
@@ -161,11 +160,6 @@ def order_summary(current_user_id: int):
             )
 )
             
-
-        
-        
-
-
 @app.post("/update_total")
 def update_total(coupon_discount: str = Form("0")):
     """Updates the total price when a coupon is applied."""
@@ -176,11 +170,9 @@ def update_total(coupon_discount: str = Form("0")):
     if not user:
         print("Error: User not found in update_total")
         return "Error: User not found", 404
-
     cart = user.get_cart()
     subtotal = cart.calculate_total_price()
     delivery_fee = 2
-
     try:
         discount_percentage = float(coupon_discount)
     except ValueError:
@@ -193,7 +185,6 @@ def update_total(coupon_discount: str = Form("0")):
 
     return f"Total: ${total:.2f}"
 
-
 @rt('/before_payment/{current_user_id}', methods=["GET"])
 def before_payment_summary(current_user_id: int, address: str = "", coupon_discount: str = Form("0"), cutlery_value: str = "0", sauce_value: str = "0", message: str = ""):
     """Handles redirection to payment after confirming order summary."""
@@ -204,7 +195,6 @@ def before_payment_summary(current_user_id: int, address: str = "", coupon_disco
     if not user:
         print("Error: User not found in before_payment")
         return "Error: User not found", 404
-
     cart = user.get_cart()
     coupon = system.show_user_coupon(current_user_id)
     print(coupon)

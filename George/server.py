@@ -9,11 +9,7 @@ class User:
         self.__password = password
     def get_id(self):
         return self.__user_id 
-    def logout(self):
-        pass
-
-    def update_profile(self):
-        pass
+    
     def get_name (self):
         return self.__name
     def get_tel (self):
@@ -50,13 +46,11 @@ class Member(User):
         if quantity <= 0:
             return "Error: Quantity must be a positive number."
 
-        # For Burger or MenuSet: process addons
         if (isinstance(menu, Burger) or isinstance(menu, MenuSet)) and addons:
             addons = tuple(sorted(addons))
         else:
             addons = tuple()
 
-        # เริ่มคำนวณราคาโดยใช้ quantity
         total_price = menu.get_price() * quantity
         if isinstance(menu, Burger) and addons:
             for addon in addons:
@@ -68,11 +62,9 @@ class Member(User):
                 "Medium": 1.5,
                 "Big": 2
             }
-            # ใช้ multiplier จาก dictionary ถ้าไม่เจอให้ default เป็น 1
             multiplier = size_price.get(sizes, 1)
             total_price = menu.get_price() * multiplier * quantity
 
-        # เพิ่มสินค้าในตะกร้าตามประเภท
         if isinstance(menu, Burger):
             self.__cart.add_item(menu, quantity, total_price, cart_addons=addons)
         elif isinstance(menu, Beverage):
@@ -110,9 +102,8 @@ class Member(User):
         
         self.__current_id += 1
         self.__order_list.append(order)
-        self.__cart = Cart()  # clear cart
-        return order  # Return the order object instead of order.get_id()
- # คืนค่า order_id เพื่อใช้ภายหลัง
+        self.__cart = Cart()  
+        return order  
 
     def pay_order(self, order_id, payment_method):
         """ชำระเงินสำหรับออเดอร์ที่เลือก"""
@@ -121,7 +112,6 @@ class Member(User):
                 if order.get_status() != "pending":
                     return f"Error: Order {order_id} is already processed."
 
-                # ชำระเงิน
                 payment_status = payment_method.process_payment(order.get_total_price())
 
                 if "Successful" in payment_status:
@@ -144,19 +134,17 @@ class Member(User):
             self.__coupon_list.remove(coupon)
 
     def exchange_point_to_coupon(self, coupon_code):
-        # """แลกแต้มเป็นคูปองจากลิสต์ที่มีอยู่"""
         available_coupons = [coupon for coupon in system.get_coupon_list() if coupon.get_name() == coupon_code]
 
         if not available_coupons:
             return "Error: Coupon not found or invalid."
 
         selected_coupon = available_coupons[0]
-        required_points = selected_coupon.get_discount() * 10  # Example: 10% discount requires 100 points
+        required_points = selected_coupon.get_discount() * 10  
 
         if self.__point < required_points:
             return "Error: Not enough points."
 
-        # Deduct points and add the coupon
         self.__point -= required_points
         self.__coupon_list.append(selected_coupon)
 
@@ -168,7 +156,7 @@ class Member(User):
         return f"Address updated to: {name}, {detail}"
 
     def get_address_list(self):
-        return self.__address_list  # Return an empty list if no address exists
+        return self.__address_list  
 
 
     def view_order_history(self):
@@ -187,16 +175,15 @@ class Admin(User):
     def view_orders(self, system):
         all_orders = []
         for user in system.get_user_list():
-            if isinstance(user, Member):  # Only members have orders
                 all_orders.extend(user.get_order_list())
         return "\n".join(str(order) for order in all_orders) if all_orders else "No orders found."
 
     def manage_menu(self, system, action, menu_item=None, menu_id=None):
         if action == "add" and menu_item:
-            return system.add_menu(menu_item)  # Let System handle menu addition
+            return system.add_menu(menu_item)  
 
         elif action == "remove" and menu_id:
-            return system.remove_menu(menu_id)  # Let System handle menu removal
+            return system.remove_menu(menu_id)  
 
         return "Invalid action or missing parameters."
 
@@ -288,7 +275,6 @@ class Cart:
     #     return "Item added to cart."
     def add_item(self, menu, quantity, total_price, cart_addons=None, cart_sizes=None):
         cart_addons = tuple(sorted(cart_addons)) if cart_addons else tuple()
-        # ตรวจสอบว่ามีสินค้าเดิมที่มี add-ons หรือ size เดียวกันอยู่แล้วหรือไม่
         for item in self.__item_list:
             if (isinstance(menu, Burger) or isinstance(menu, MenuSet)) and item.get_menu() == menu and item.get_addons() == cart_addons:
                 item.update_quantity(quantity)
@@ -296,7 +282,6 @@ class Cart:
             elif isinstance(menu, Beverage) and item.get_menu() == menu and item.get_sizes() == cart_sizes:
                 item.update_quantity(quantity)
                 return "Item quantity updated in cart."
-        # ถ้าไม่มีรายการเดิม ให้สร้างรายการใหม่
         if isinstance(menu, Burger):
             new_item = CartItem(menu, quantity, total_price, cart_item_addons=cart_addons)
         elif isinstance(menu, Beverage):
@@ -366,7 +351,7 @@ class CartItem:
         self.__menu = menu
         self.__amount = amount
         self.__total_price = total_price
-        self.__addons = cart_item_addons  # Store add-ons to distinguish different combinations
+        self.__addons = cart_item_addons 
         self.__sizes = cart_item_sizes
 
     def get_menu(self):
@@ -414,7 +399,7 @@ class Order:
         self.__status = status
         self.__member = member
         self.__total_price = total_price
-        self.__cart_items = member.get_cart().get_item_list()  # ✅ Store cart items
+        self.__cart_items = member.get_cart().get_item_list()  
         self.__payment = None
 
     def get_cart_items(self):
@@ -521,16 +506,11 @@ class System:
             if user.get_name() == new_user.get_name():
                 return False
         self.__user_list.append(new_user)
-        # print(self.get_user_list())
         global current_user_id
         current_user_id = new_user.get_id()
         return True
 
-    # def check_admin(self, username, password):
-    #     for user in self.__user_list:
-    #         if user.get_name() == username and user.get_password() == password:
-    #             return user
-    #     return False
+    
 
     def get_coupon_list(self):
         return self.__coupon_list
@@ -538,12 +518,10 @@ class System:
     def add_coupon(self,coupon : Coupon):
         self.__coupon_list.append(coupon)
     def add_menu(self, menu_item : Menu):
-        # """Adds a menu item to the system."""
         self.__menu_list.append(menu_item)
         return f"Menu item '{menu_item.get_name()}' added successfully."
 
     def remove_menu(self, menu_id):
-        # """Removes a menu item from the system."""
         menu_to_remove = self.search_menu_by_id(menu_id)
         if menu_to_remove:
             self.__menu_list.remove(menu_to_remove)
@@ -662,18 +640,15 @@ class System:
 def create_mockup_instances():
     system = System()
     
-    # Create admin and member users
     admin = Admin(1, "admin", "123456789", "admin", "SuperAdmin")
     member = Member(2, "aa", "987654321", "aa","Doe")
     
     system._System__user_list = [admin, member]
     
-    # Assign an address to the member
-    member.add_address("Home", "123 Main Street, City, Country")  # ✅ Proper method call
+    member.add_address("Home", "123 Main Street, City, Country")  
     member2 = Member(3, "ss", "987654321", "ss","Doe")
     system.add_user_list(member2)
     
-    # Create menu items
     burger = Burger("Burger", 1, "Ultimate Bacon Burger", 7.59, "Delicious Bacon Burger",  "/picture/Burger/Ultimate-Bacon-Burger.png")
     burger2 = Burger("Burger", 2, "Mushroom Swiss Burger", 5.55, "Delicious Mushroom Swiss Burger",  "/picture/Burger/Mushroom-Swiss-Burger.png")
     burger3 = Burger("Burger", 3, "Grilled Beef Burger", 5.99, "Let's Try Grilled Beef Burger",  "/picture/Burger/Grilled-Beef-Burger.png")
@@ -747,7 +722,6 @@ def create_mockup_instances():
     }
 
 
-# Example usage with mockup data
 
 mockup_data = create_mockup_instances()
 system = mockup_data["system"]
@@ -885,7 +859,7 @@ def testrun(system, member,admin):
     
         
     print(member.get_address_list())  # Output: Home: 123 Main Street, City, Country  
-    print(member.add_address("Home", "gg"))
+    print(member.add_address("Work", "KMITL"))
     print(member.get_address_list())  # Output: Home: 123 Main Street, City, Country
 
     # View order history
@@ -916,4 +890,4 @@ def testrun(system, member,admin):
     for order in system.search_user_by_id(3).get_order_list():
         print(f"aaa{order.get_total_price()}")
         print(order)
-testrun(system, member,admin)
+# testrun(system, member,admin)

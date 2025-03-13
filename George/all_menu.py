@@ -87,7 +87,6 @@ def filter(category: str):
                 # """
             ),id="product-list")
 
-# user_id = session.get('current_user_id', None)
 @rt("/home", methods=["GET","POST"])
 def home():
     global count
@@ -201,7 +200,6 @@ def home():
         )
     )
 
-
 @app.get("/detail/{menu_id}")
 def detail(menu_id: int):
     global base_price
@@ -270,17 +268,17 @@ def detail(menu_id: int):
                     Div(
                         H4("Add on", Class="section-title", style="color: #502314; font-size: 24px; font-weight: bold; "), 
                         Form(
-                            # Show add-ons for Burger or Beverage
+                            
                             (Div(
                                 Label(CheckboxX(id="More_Patty", name="More_Patty", value="More_Patty", hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML" ),"More Patty +1$" , style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="Bacon", name="Bacon", value="Bacon",hx_post="/update_price", hx_target="#price", hx_trigger="change" , hx_swap="innerHTML"),"Bacon +0.75$" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(CheckboxX(id="More_Cheese", name="More_Cheese", value="More_Cheese", hx_post="/update_price",hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "More Cheese +0.5$", style="color: #502314; font-size: 18px; font-weight: bold;")
                             )) if menu.get_category() == "Burger" else (
-                            # Show size options for Beverages
+                            
                             (Label(Input(type = "radio",id="Small", name="size", value="Small", hx_post="/update_price", hx_trigger="change",hx_target="#price"  , hx_swap="innerHTML" ), "Small" , style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(Input(type = "radio",id="Medium", name="size", value="Medium",hx_post="/update_price",hx_trigger="change" , hx_target="#price" , hx_swap="innerHTML"), "Medium" ,  style="color: #502314; font-size: 18px; font-weight: bold;"),
                                 Label(Input(type = "radio",id="Big", name="size", value="Big", hx_post="/update_price", hx_trigger="change" , hx_target="#price", hx_swap="innerHTML"), "Big", style="color: #502314; font-size: 18px; font-weight: bold;")) if menu.get_category() == "Beverage" else (
-                            # For Snack or Combo Set, don't show add-ons or size options
+                            
                             ()),
                             Hr(style="border: 1px solid #000; opacity: 0.5;")
                             ),
@@ -370,25 +368,18 @@ def detail(menu_id: int):
 def post( menu_id: int, count: int = Form(1),More_Patty: Optional[str] = Form(None), Bacon: Optional[str] = Form(None), More_Cheese: Optional[str] = Form(None), size: Optional[str] = Form(None)):
     global current_user_id
     menu_item = system.select_menu(menu_id)
-
     if isinstance(menu_item, Burger):
-        # If the add-ons are not checked, their value will be None.
         print(f"Add-ons: More Patty = {More_Patty}, Bacon = {Bacon}, More Cheese = {More_Cheese}")
-        # Only pass add-ons if they are selected
         add_ons = [More_Patty, Bacon, More_Cheese]
-        # Filter out None values
         add_ons = [addon for addon in add_ons if addon is not None]
         system.add_to_cart(server.current_user_id, menu_item, count, add_ons)
-
     elif isinstance(menu_item, Beverage):
         print(f"Size: {size}")
         # print()
         if size:
-            system.add_to_cart(server.current_user_id, menu_item, count, size = size)
-            
+            system.add_to_cart(server.current_user_id, menu_item, count, size = size) 
         else:
             return "Size is required for beverages."
-
     else:
         system.add_to_cart(server.current_user_id, menu_item, count)
     size = None
@@ -449,34 +440,29 @@ async def update_price(
 ):
     global base_price
 
-    # Calculate the base price for the selected size (if applicable)
     size_price = 1
     print(size)
     
     if size == "Small":
-        size_price = 1  # Small might have the base price (no increase)
+        size_price = 1  
     elif size == "Medium":
         
-        size_price = 1.5  # Example: Medium costs +1$
+        size_price = 1.5  
     elif size == "Big":
-        size_price = 2.0  # Example: Big costs +2$
+        size_price = 2.0  
     
-    # Calculate the total price based on the base price, add-ons, size, and quantity
-    total_price = (base_price*size_price) * count  # Add size price for quantity
+    total_price = (base_price*size_price) * count 
 
-    # Add the price for selected add-ons
-    
     if More_Patty == "More_Patty":
-        total_price += 1.0 * count  # More Patty costs +1$ per count
+        total_price += 1.0 * count  
         print("More Patty selected")
     if Bacon == "Bacon":
-        total_price += 0.75 * count  # Bacon costs +0.75$ per count
+        total_price += 0.75 * count  
         print("Bacon selected")
     if More_Cheese == "More_Cheese":
-        total_price += 0.5 * count  # More Cheese costs +0.5$ per count
+        total_price += 0.5 * count 
         print("More Cheese selected")
 
-    # Return the updated price
     return f"Price - {total_price:.2f}$"
 
 

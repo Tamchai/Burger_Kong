@@ -125,6 +125,7 @@ def product_manager():
                     id="product-table"
                 ),
                 style="""
+                  margin-top: 3%;
                   background: #f5ebdc;
                   border: 2px solid #502314;
                   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
@@ -148,11 +149,11 @@ def add_coupon(image_url:str, name:str, price:int, description:str, category:str
         system.add_menu(product_to_add)
         return RedirectResponse("/product_manager")
     elif category == "Beverage":
-        product_to_add = server.Beverage("Beverage",len(server.system.get_menu_list())+1,name,price,description,"Big",image_url)
+        product_to_add = server.Beverage("Beverage",len(server.system.get_menu_list())+1,name,price,description,image_url)
         system.add_menu(product_to_add)
         return RedirectResponse("/product_manager")
     elif category == "Snack":
-         product_to_add = server.Snack("Snack",len(server.system.get_menu_list()+1),name,price,description,image_url)
+         product_to_add = server.Snack("Snack",len(server.system.get_menu_list())+1,name,price,description,image_url)
          system.add_menu(product_to_add)
          return RedirectResponse("/product_manager")
     else :

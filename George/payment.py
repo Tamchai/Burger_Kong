@@ -130,7 +130,6 @@ def get(current_user_id:  int,total_price: float, order_id:int ):
         creditOptions.style.display = 'none';
     }
 });
-
 document.getElementById('credit').addEventListener('change', function() {
     var qrcodeOptions = document.getElementById('qrcode-options');
     var creditOptions = document.getElementById('credit-options');

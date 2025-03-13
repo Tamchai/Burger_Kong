@@ -4,9 +4,6 @@ import server
 from server import Member
 system = server.system 
 
-
-# user_points = 1500
-
 @rt('/coupon_member/{current_user_id}',methods=["GET","POST"])
 def coupon_member(current_user_id : int):
     coupon_list = system.get_coupon_list()
@@ -89,9 +86,9 @@ def coupon_member(current_user_id : int):
                                     Td(coupon.get_expire_date(),style="font-weight: normal; font-size: 18px; color: #502314; background: #f5ebdc; padding: 8px; border: 1px none; text-align: center;"),
                                     Td(
                                 Button("Exchange",
-                                    hx_delete=f"/use_coupon/{current_user_id}/{coupon.get_name()}",  # ✅ Use hx_delete for proper HTTP semantics
-                                    hx_target=f"result",  # ✅ Targets the table body
-                                    hx_swap="outerHTML",  # ✅ Replaces only the table body, not the full page
+                                    hx_delete=f"/use_coupon/{current_user_id}/{coupon.get_name()}",  
+                                    hx_target=f"result",  
+                                    hx_swap="outerHTML",  
                                     style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
                                 ),method = "POST",
                                 style="text-align: center; border: 1px none; background: #f5ebdc; padding: 8px;"
@@ -110,10 +107,10 @@ def coupon_member(current_user_id : int):
                             margin-top: 20px;
                         """
                     ),
-                style="display: flex; flex-direction: column; background: #f5ebdc; padding: 20px; border-radius: 30px; width: 75%; height: 90vh; margin: auto; border: 1px solid #502314;"
+                style="display: flex; flex-direction: column; background: #f5ebdc; padding: 20px; border-radius: 30px; width: 75%; height: 120vh; margin: auto; border: 1px solid #502314;"
                 ),
             ),
-            style="margin-top: 3%;background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+            style="margin-top: 3%;background: #f5ebdc; min-height: 120vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
         )
     )
 
@@ -121,12 +118,12 @@ def coupon_member(current_user_id : int):
 def use_coupon(current_user_id: int, coupon_name: str):
     user = system.search_user_by_id(current_user_id)
 
-# Remove coupon from the user's list and deduct points
+
     if user.remove_coupon(coupon_name):
-        # Assuming a coupon gives some discount, you can adjust the point deduction
-        coupon = system.get_coupon_list().get(coupon_name)  # Find the coupon by name
-        points_deducted = coupon.get_discount() * 10  # Example logic to convert discount to points
-        user.add_point(-points_deducted)  # Deduct points
+    
+        coupon = system.get_coupon_list().get(coupon_name) 
+        points_deducted = coupon.get_discount() * 10 
+        user.add_point(-points_deducted) 
 
     return Div(Tbody(
         *[
@@ -143,7 +140,7 @@ def use_coupon(current_user_id: int, coupon_name: str):
                     ),
                     style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
                 )
-            ) for coupon in user.get_coupon()  # Loop through the user's coupons
+            ) for coupon in user.get_coupon()  
         ]
     ), id="product-list")
 

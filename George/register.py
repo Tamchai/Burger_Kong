@@ -2,10 +2,9 @@ from fasthtml.common import *
 from routing import app, rt
 import server
 from server import Admin
-system = server.system  
-# from server import current_user_id
+system = server.system
 user_id = None
-@app.get('/')
+@rt('/', methods=["GET","POST"])
 def login_page():
     return Title("Burger Kong"),Container(
         Div(
@@ -203,9 +202,8 @@ def registers(title: str, firstname: str, lastname: str, mobile: str, birthdate:
             lastname = lastname
         )
         if system.register(new_user):
-            # Update the global variable in watch_and_seedetail
             server.current_user_id = new_user.get_id()
-            return RedirectResponse("/home")
+            return RedirectResponse("/")
         else: 
             return H1("Registration failed: Username already exists.")
 
@@ -229,5 +227,4 @@ def login(username: str, password: str):
         user_id = server.current_user_id
         print( user_id)
         return RedirectResponse("/home")
-
 serve()

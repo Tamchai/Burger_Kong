@@ -6,7 +6,6 @@ import admin
 system = server.system     
 from server import *
 
-
 @rt('/admin_view_member_order', methods=["GET", "POST"])
 def get():
     member_list = system.get_user_list()
@@ -37,7 +36,7 @@ def get():
                         *[(
                                 Div(
                                     H2(member.get_name(), style="color: #502314;"),
-                                    style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
+                                    style="color: #502314; display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
                                 ),
                                 Div(
                                         Div(

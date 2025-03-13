@@ -5,7 +5,6 @@ from server import *
 system = server.system
 member = server.member
 
-
 @app.get('/select_address/{current_user_id}', methods=["GET","POST"])
 def select_address(current_user_id:int):
     user = system.search_user_by_id(current_user_id)
@@ -82,9 +81,10 @@ def select_address(current_user_id:int):
                 ), action = f"/add_address/{current_user_id}", method = "GET",
                 style="display: flex; justify-content: center; align-items: center; margin-top: 10px;"
             )),
-            style="display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: #f5ebdc; padding-bottom: 50px; margin-top: 3%;"
+            style="display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: #f5ebdc; padding-bottom: 50px;"
         )
     )   
+
 @app.post('/make_add_address/{current_user_id}')
 def add(current_user_id:int, name:str, detail:str):
     user = system.search_user_by_id(current_user_id)
@@ -139,23 +139,15 @@ def add_address(current_user_id : int):
         Body(
             H1("Add new address", style="color: #502314; text-align: center; margin-top: 80px;"),
             Form(
-                Div(
-                Label("Address name", style="font-size: 28px; font-weight: bold; color: #502314; font-size: 18px;"),
+                Label("Address name", style="font-size: 32px; font-weight: bold; color: #502314; font-size: 18px;"),
                 Input(placeholder="Home, Office, etc.",type="text",id = "name", style="color: #502314; width: 100%; background: #fff; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd;"),
-                
-                Label("Address detail", style="font-size: 28px; font-weight: bold; color: #502314; font-size: 18px;"),
+                Label("Address detail", style="font-size: 32px; font-weight: bold; color: #502314; font-size: 18px;"),
                 Textarea(placeholder="Street, City, Province, etc.",id="detail", style="color: #502314; width: 100%; background: #fff; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd;"),
-                Button("Add address",type="submit",
-                       style="background: #D00000; color: white; padding: 10px 20px; border-radius: 10px;cursor: pointer; border: none; border-radius: 15px; font-size: 18px; margin-top: 15px; width: 100%;"),
-                       action = f"/make_add_address/{current_user_id}", method = "POST"
-                ),
-                style="background: #f5ebdc; padding: 20px; border-radius: 10px; width: 50%; margin: auto;box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); border: 1px solid #ddd;"
-
+                Button("Add address",type="submit", style="background: #502314; color: #fff; padding: 10px 20px; border: none; border-radius: 15px; cursor: pointer;"),action = f"/make_add_address/{current_user_id}", method = "POST",
+                style="width: 100%;"
             ),
-             style="margin-top: 2%; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: #f5ebdc; padding-bottom: 50px;"
+            style="margin-top: 2%; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: #f5ebdc; padding-bottom: 50px; margin-top: 2%"
         )
     )
-
-
 
 serve()
