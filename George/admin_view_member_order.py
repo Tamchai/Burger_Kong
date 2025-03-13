@@ -51,7 +51,7 @@ def get():
                                         ),style="padding-left: 10px;"
                                 ),
                                 Div(H3(
-                                    f"Total Price: {order.get_total_price()} $",
+                                    f"Total Price: {order.get_total_price()+2} $",
                                     style=""" 
                                         color: #502314; 
                                         padding: 5px 10px; 

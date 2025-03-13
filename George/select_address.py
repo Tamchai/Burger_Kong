@@ -142,7 +142,7 @@ def add_address(current_user_id : int):
                 Input(placeholder="Home, Office, etc.",type="text",id = "name", style="padding: 10px; width: 100%; margin-bottom: 10px;"),
                 Label("Address detail", style="color: #502314; font-size: 18px;"),
                 Textarea(placeholder="Street, City, Province, etc.",id="detail", style="padding: 10px; width: 100%; margin-bottom: 10px;"),
-                Button("Add address",type="submit", style="background: #502314; color: #fff; padding: 10px 20px; border: none; border-radius: 15px; cursor: pointer;"),action = f"/make_add_address/{current_user_id}", method = "POST"
+                Button("Add address",type="submit", style="width: 80%; background: #502314; color: #fff; padding: 10px 20px; border: none; border-radius: 15px; cursor: pointer;"),action = f"/make_add_address/{current_user_id}", method = "POST"
             )
         )
     )

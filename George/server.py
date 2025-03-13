@@ -117,7 +117,7 @@ class Member(User):
     def pay_order(self, order_id, payment_method):
         """ชำระเงินสำหรับออเดอร์ที่เลือก"""
         for order in self.__order_list:
-            if order.get_id() == order_id:
+            if order.get_id() == order_id.get_id():
                 if order.get_status() != "pending":
                     return f"Error: Order {order_id} is already processed."
 
@@ -420,14 +420,14 @@ class Order:
     def get_cart_items(self):
         return self.__cart_items
     
-    def __str__(self):
-        item_details = "\n".join(str(item) for item in self.__cart_items)
-        return (
-            # f"Order ID: {self.__order_id}\n"
-            # f"Status: {self.__status}\n"
-            # f"Total Price: ${self.__total_price:.2f}\n"
-            f"Items:\n{item_details}\n"
-        )
+    # def __str__(self):
+    #     item_details = "\n".join(str(item) for item in self.__cart_items)
+    #     return (
+    #         # f"Order ID: {self.__order_id}\n"
+    #         # f"Status: {self.__status}\n"
+    #         # f"Total Price: ${self.__total_price:.2f}\n"
+    #         f"Items:\n{item_details}\n"
+    #     )
     def get_total_price(self):
         return self.__total_price
 
@@ -715,6 +715,9 @@ def create_mockup_instances():
     
     menu_set.add_menu_item = [burger, drink, snack]
     member.add_coupon_to_list(Coupon("DISCOUNT10", 10, "2025-12-31"))
+    member.add_coupon_to_list(coupon2)
+    member.add_coupon_to_list(coupon1)
+    member.add_coupon_to_list(coupon3)
     for i in [burger, burger2, burger3, burger4,burger5, burger6, burger7, burger8,  snack, snack2, snack3, snack4, snack5, snack6, menu_set, menu_set2, menu_set3, menu_set4, menu_set5, menu_set6, drink, drink2, drink3, drink4, drink5, drink6]:
         system.add_menu(i) 
     for i in system.get_menu_list():
@@ -817,55 +820,55 @@ def testrun(system, member,admin):
         print(f"aaa{order.get_total_price()}")
         print(order)
     
-    payment_method = CreditCard("1234567890123456", "12/25", "123")
-    print(system.pay_order(user_id,order_id,payment_method))
-    for order in member.get_order_list():
-        print(order)
-    # Show available coupons before exchanging
-    available_coupons = system.get_coupon_list()
-    print("Available Coupons for Exchange:")
-    for coupon in available_coupons:
-        print(f"{coupon.get_name()} - {coupon.get_discount()}% discount")
+    # payment_method = CreditCard("1234567890123456", "12/25", "123")
+    # print(system.pay_order(user_id,order_id,payment_method))
+    # for order in member.get_order_list():
+    #     print(order)
+    # # Show available coupons before exchanging
+    # available_coupons = system.get_coupon_list()
+    # print("Available Coupons for Exchange:")
+    # for coupon in available_coupons:
+    #     print(f"{coupon.get_name()} - {coupon.get_discount()}% discount")
 
-    # Choose a coupon to exchange (assuming we pick the first one)
-    if available_coupons:
-        selected_coupon_code = available_coupons[0].get_name()
-        print(f"\nAttempting to exchange for coupon: {selected_coupon_code}")
-        print(system.exchange_point_to_coupon(user_id, selected_coupon_code))
-    else:
-        print("\nNo available coupons for exchange.")
-    selected_menu = system.select_menu(2)
-    result = system.add_to_cart(3, selected_menu, 2, add_on)
-    result = system.add_to_cart(3, selected_menu, 2, add_on)
-    result = system.add_to_cart(3, selected_menu, 2, None)
-    result = system.add_to_cart(3, selected_menu, 2, None)
+    # # Choose a coupon to exchange (assuming we pick the first one)
+    # if available_coupons:
+    #     selected_coupon_code = available_coupons[0].get_name()
+    #     print(f"\nAttempting to exchange for coupon: {selected_coupon_code}")
+    #     print(system.exchange_point_to_coupon(user_id, selected_coupon_code))
+    # else:
+    #     print("\nNo available coupons for exchange.")
+    # selected_menu = system.select_menu(2)
+    # result = system.add_to_cart(3, selected_menu, 2, add_on)
+    # result = system.add_to_cart(3, selected_menu, 2, add_on)
+    # result = system.add_to_cart(3, selected_menu, 2, None)
+    # result = system.add_to_cart(3, selected_menu, 2, None)
     
-    selected_menu = system.select_menu(200)
-    result = system.add_to_cart(3, selected_menu, 2, size="Big")
-    result = system.add_to_cart(3, selected_menu, 2, size="Small")  
-    user_id = 3
-    print(system.checkout(user_id))
-    print(system.watch_cart(user_id))
-    print(system.show_total_price(user_id))
-    print(system.checkout(user_id))    
-    print(system.create_order(user_id))
-    print(system.pay_order(user_id,1001,payment_method))
-    selected_menu = system.select_menu(2)
-    result = system.add_to_cart(3, selected_menu, 2, add_on)
-    result = system.add_to_cart(3, selected_menu, 2, add_on)
-    result = system.add_to_cart(3, selected_menu, 2, None)
-    result = system.add_to_cart(3, selected_menu, 2, None)
+    # selected_menu = system.select_menu(200)
+    # result = system.add_to_cart(3, selected_menu, 2, size="Big")
+    # result = system.add_to_cart(3, selected_menu, 2, size="Small")  
+    # user_id = 3
+    # print(system.checkout(user_id))
+    # print(system.watch_cart(user_id))
+    # print(system.show_total_price(user_id))
+    # print(system.checkout(user_id))    
+    # print(system.create_order(user_id))
+    # print(system.pay_order(user_id,1001,payment_method))
+    # selected_menu = system.select_menu(2)
+    # result = system.add_to_cart(3, selected_menu, 2, add_on)
+    # result = system.add_to_cart(3, selected_menu, 2, add_on)
+    # result = system.add_to_cart(3, selected_menu, 2, None)
+    # result = system.add_to_cart(3, selected_menu, 2, None)
     
-    selected_menu = system.select_menu(200)
-    result = system.add_to_cart(3, selected_menu, 2, size="Big")
-    result = system.add_to_cart(3, selected_menu, 2, size="Small")  
-    user_id = 3
-    print(system.checkout(user_id))
-    print(system.watch_cart(user_id))
-    print(system.show_total_price(user_id))
-    print(system.checkout(user_id))    
-    print(system.create_order(user_id))
-    print(system.pay_order(user_id,1,payment_method))
+    # selected_menu = system.select_menu(200)
+    # result = system.add_to_cart(3, selected_menu, 2, size="Big")
+    # result = system.add_to_cart(3, selected_menu, 2, size="Small")  
+    # user_id = 3
+    # print(system.checkout(user_id))
+    # print(system.watch_cart(user_id))
+    # print(system.show_total_price(user_id))
+    # print(system.checkout(user_id))    
+    # print(system.create_order(user_id))
+    # print(system.pay_order(user_id,1,payment_method))
     for i in member.get_order_list():
         print("-------------")
         print(i)
