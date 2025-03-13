@@ -94,7 +94,7 @@ def coupon_member(current_user_id : int):
                                     hx_swap="outerHTML",  # ✅ Replaces only the table body, not the full page
                                     style="background: #D00; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
                                 ),method = "POST",
-                                style="text-align: center; border: 1px solid #502314; background: #fff8f0; padding: 8px;"
+                                style="text-align: center; border: 1px none; background: #f5ebdc; padding: 8px;"
                             ),id = "result"
                                 )
                                 for coupon in coupon_list

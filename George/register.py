@@ -185,7 +185,7 @@ def creat_account_page():
                 ),
                 style="position: relative; top: -100px;"
             ),
-            style="background: #f5ebdc; display: flex; justify-content: center; align-items: center; height: 140vh; margin: 0; margin-top: 1%;"
+            style="background: #f5ebdc; display: flex; justify-content: center; align-items: center; height: 140vh; margin: 0; margin-top: 30px;"
         )
     )
 

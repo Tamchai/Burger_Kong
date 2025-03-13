@@ -107,13 +107,12 @@ def get(current_user_id:  int,total_price: float, order_id:int ):
                     ),
                         style="display: flex; flex-direction: column; gap: 15px; background: #fff; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);"
                     ),
-         Div(
-    Label(Strong(f"ราคาสุทธิ: {total_price}"), 
-    Span("...", id="total_price", hx_get="/total_price", hx_trigger="load"),  # ดึงราคาอัตโนมัติ
-    " บาท",
-    style="font-size: 24px; text-align: center; color: #502314;")
-),
-                    Button("สั่งอาหาร", type="submit", style="background: #502314; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; margin-top: 20px;"),
+                Div(
+                    Label(Strong(f"Total: {total_price}"), 
+                    Span("...", id="total_price", hx_get="/total_price", hx_trigger="load"),"$",
+                        style="font-size: 24px; text-align: center; color: #502314;")
+                    ),
+                Button("สั่งอาหาร", type="submit", style="background: #502314; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; margin-top: 20px;"),
                     method="GET",
                     action=f"/submit/{current_user_id}/{order_id}",
                     style="max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);"

@@ -23,58 +23,152 @@ def order_summary(current_user_id: int):
 
     # Calculate total including discount
     total_price = cart.calculate_total_price() + 2 - discount_amount
-
     return Container(
-        H1("Order Summary", style="color: #502314; text-align: center; padding: 10px;"),
-        Form(  # 🛠 Wrapped in a form to ensure proper form submission
+        Div(
             Div(
-                H3("Delivery to", style="color: #502314;"),
-                Select(
-                    *[Option(f"{address.get_name()} - {address.get_detail()}", id="address", name="address") for address in address_list],
-                    name="address",  # Added name to ensure form submission
-                    style="background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 8px; font-size: 16px; color: #502314;"
+                Div(
+                    Form(Button(
+                        Img(src="https://i.imgur.com/fCpADUO.png", style="width: 50px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;",type="submit"),action = "/home",method = "GET"),      
+                    H2("Burger Kong", style="color: #502314; margin: 0;"),
+                    style="display: flex; align-items: center; gap: 10px; "
                 ),
-                style="background: #f5ebdc; padding: 15px; border-radius: 30px; width: 60%; margin: auto;"
+                Div(
+                        Form(
+                            Button(
+                            Img(src="https://i.imgur.com/SwkvgTW.png",style="width: 40px; height: auto; margin-right: 15px;"),
+                            style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/select_address/{current_user_id}", method = "GET"),
+                        Form(Button(
+                        Img(src="https://i.imgur.com/Xyhfm0Q.png", style="width: 40px; height: auto;"),
+                            style="background: none; border: none; cursor: pointer;", type = "submit"), action = "####", method = "GET"),
+                        Form(Button(
+                            Img(src="https://i.imgur.com/JZR6dA6.png", style="width: 45px; height: auto;"),
+                                style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/coupon_member/{current_user_id}", method = "GET"),
+                        Form(Button(
+                            Img(src="https://i.imgur.com/2eQjSEg.png", style="width: 45px; height: auto;"),
+                                style="background: none; border: none; cursor: pointer;", type = "submit"), action = f"/view_cart/{current_user_id}", method = "POST"),
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 20px;"
+                    ),
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%;"
             ),
-            Div(
-                H3("Your Order", style="color: #502314;"),
-                *[
-                    Div(
-                        Div(f"{item.get_menu().get_name()} x {item.get_quantity()}",
-                            style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
-                        Div(f"${item.get_total_price():.2f}",
-                            style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px;"),
-                        style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #ccc;"
-                    )
-                    for item in cart.get_item_list()
-                ],
-                style="width: 50%; padding: 15px;"
-            ),
-            Div(
-                H3(f"Subtotal: ${cart.calculate_total_price():.2f}", style="color: #502314;"),
-                H3("Delivery Fee: $2", style="color: #502314;"),
-                H3(f"Discount: ${discount_amount:.2f}", style="color: #502314;"),
-                H2(f"Total: ${total_price:.2f}", id="total", style="color: #D00000; font-weight: bold;"),
-                Select(
-                    *[Option(f"{coupon.get_name()} - {coupon.get_discount()}%", value=coupon.get_name()) for coupon in system.get_coupon_list()],
-                    name="coupon_discount",
-                    id="coupon_discount",
-                    hx_post="/update_total",
-                    hx_trigger="change",
-                    hx_target="#total",
-                    hx_swap="innerHTML",
-                    style="background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 8px; font-size: 16px; color: #502314;"
-                ),
-                Button("Checkout", type="submit",
-                       style="background-color: #D00000; color: #ffffff; width: 100%; padding: 10px; border: none;"),
-                action=f"/before_payment/{current_user_id}", method="GET",  # 🛠 Corrected form submission
-                style="width: 50%; padding: 15px; background: #f5ebdc; border-radius: 30px;"
-            ),
-            method="GET",  # 🛠 Added method for proper request
-            action=f"/before_payment/{current_user_id}"  # 🛠 Ensures form redirects to the right endpoint
+            style="""
+                width: 100%; 
+                background: #f5ebdc; 
+                padding: 15px; 
+                border-bottom: 2px solid #502314;
+                position: fixed; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                z-index: 1000;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+            """
         ),
-        style="background: #f5ebdc; min-height: 100vh; padding-top: 120px;"
-    )
+        Body(
+            H1("Order Summary", style="color: #502314; text-align: center; padding: 15px;"),
+            Form(
+                Div(
+                    H3("Delivery to", style="color: #502314;"),
+                    Select(
+                        *[Option(f"{address.get_name()} - {address.get_detail()}", id="address", name="address") for address in address_list],
+                        name="address",
+                        style="""
+                            background: #fff; 
+                            border: 1px solid #ccc; 
+                            border-radius: 8px; 
+                            padding: 10px; 
+                            font-size: 16px;
+                            color: #502314;
+                        """
+                    ),
+                    style="""
+                        background: #f5ebdc; 
+                        padding: 20px; 
+                        border-radius: 20px; 
+                        margin-bottom: 20px; 
+                        width: 80%; 
+                        border: 2px solid #502314; 
+                        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+                        margin: auto;
+                        margin-bottom: 10px;
+                    """
+                ),
+                Div(
+                    Div(
+                        Div(
+                            H3("Your Order", style="color: #502314; display: inline-block; margin-right: 10px;"),
+                            style="display: flex; align-items: center; justify-content: space-between;"
+                        ),
+                        *[
+                            Div(
+                                Div(f"{item.get_menu().get_name()} x {item.get_quantity()}",
+                                    style="font-size: 18px; font-weight: bold; color: #502314; padding: 8px;"),
+                                Div(f"${item.get_total_price():.2f}",
+                                    style="font-size: 18px; font-weight: bold; color: #502314; padding: 8px;"),
+                                style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #ddd; padding-bottom: 5px;"
+                            )
+                            for item in cart.get_item_list()
+                        ],
+                        style="width: 100%; padding: 20px; background: #f5ebdc; border-radius: 15px;"
+                    ),
+                    Div(
+                        Div(
+                            Div(
+                                Div(
+                                    H3("Subtotal:", style="color: #502314; width: 150px; text-align: left;"),
+                                    H3(f"${cart.calculate_total_price():.2f}", style="color: #502314;  flex: 1; text-align: right;"),
+                                    style="display: flex; justify-content: space-between; width: 100%;"
+                                ),
+                                Div(
+                                    H3("Delivery Fee:", style="color: #502314; width: 150px; text-align: left;"),
+                                    H3("$2", style="color: #502314;  flex: 1; text-align: right;"),
+                                    style="display: flex; justify-content: space-between; width: 100%;"
+                                ),
+                                Div(
+                                    H3("Discount:", style="color: #502314; width: 150px; text-align: left;"),
+                                    H3(f"${discount_amount:.2f}", style="color: #502314;  flex: 1; text-align: right;"),
+                                    style="display: flex; justify-content: space-between; width: 100%;"
+                                ),
+                                style="""
+                                    background: #f5ebdc; 
+                                    padding: 15px; 
+                                    border-radius: 10px; 
+                                    width: 100%; 
+                                    display: flex; 
+                                    flex-direction: column; 
+                                    gap: 10px;
+                                    align-items: flex-start;
+                                """
+                            )
+                        ),
+                        H3("Coupon Discount", style="color: #502314; margin-top: 15px;text-align: left;"),
+                        Select(
+                            *[Option(f"{coupon.get_name()} - {coupon.get_discount()}%", value=coupon.get_name()) for coupon in system.get_coupon_list()],
+                            name="coupon_discount",
+                            id="coupon_discount",
+                            hx_post="/update_total",
+                            hx_trigger="change",
+                            hx_target="#total",
+                            hx_swap="innerHTML",
+                            style="background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 10px; font-size: 16px; color: #502314;"
+                        ),
+                        H2(f"Total: ${total_price:.2f}", id="total", style="color: #D00000; font-weight: bold;"),
+                        Button("Checkout", type="submit", style="background-color: #D00000; color: #ffffff; width: 100%; padding: 12px; border: none; border-radius: 8px; margin-top: 10px;"),
+                        style="width: 100%;"
+                    ),
+                    style="display: flex; justify-content: space-between; background: #f5ebdc; padding: 15px; border-radius: 30px; width: 80%; margin: auto; margin-top: 20px; border: 1px solid #502314; gap: 20px;"
+                ),
+                method="GET",
+                action=f"/before_payment/{current_user_id}",
+                style="background: #f5ebdc; padding: 20px; border-radius: 20px; width: 80%; margin: auto; margin-top: 30px;"
+            ),
+            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 100px;"
+            )
+)
+            
+
+        
+        
 
 
 @app.post("/update_total")

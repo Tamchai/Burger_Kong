@@ -100,8 +100,8 @@ def view_cart(current_user_id : int):
                         Div(
                             H3("Discount:", style="color: #502314;"),
                             Div(
-    H2(f"Total: ${user.get_cart().calculate_total_price():.2f}", id="total", style="color: #D00000; font-weight: bold; margin-top: 10px;")
-),  
+                                H2(f"Total: ${user.get_cart().calculate_total_price():.2f}", id="total", style="color: #D00000; font-weight: bold; margin-top: 10px;")
+                            ),  
                             Div(
                                 Button("Checkout",style="font-size: 20px; font-weight: bold; background-color: #D00000; color: #ffffff; width: 50%; padding: 10px; border: none; display: block; margin: auto; border-radius: 10px;",onclick=f"window.location.href='/order_summary/{current_user_id}'"),
                                 action =f"/order_summary/{current_user_id}", method = "GET",
@@ -115,7 +115,7 @@ def view_cart(current_user_id : int):
                 ),
                  style="display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%;"
             ),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;"
+            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; margin-top: 30px;"
         )
 )
 
