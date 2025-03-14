@@ -1,0 +1,40 @@
+sequenceDiagram
+    Actor User
+    participant UI
+    participant System
+    participant Member
+    participant Cart
+    participant Order
+
+    User ->> UI : Click "Confirm Order" button
+    UI ->> System : create_order(user_id)
+    System ->> System : search_user_by_id(user_id)
+
+    alt if user exists
+        System ->> Member : create_order()
+        Member ->> Cart : get_item_list()
+        Cart -->> Member : return item_list
+
+        alt if cart is empty
+            Member -->> System : return "Error: Cart is empty!"
+            System -->> UI : return "Error: Cart is empty!"
+            UI -->> User : Display error message
+        else if cart has items
+            Member ->> Cart : calculate_total_price()
+            Cart -->> Member : return total_price
+
+            Member ->> Order : create Order(order_id, member, total_price, status="pending")
+            Order -->> Member : return order_id
+
+            Member ->> Member : increment current_order_id
+            Member ->> Member : store order in order_list
+            Member ->> Member : reset cart (create new Cart)
+
+            Member -->> System : return order_id
+            System -->> UI : return order_id
+            UI -->> User : Display "Order confirmed successfully"
+        end
+    else user not found
+        System -->> UI : return "Error: User not found"
+        UI -->> User : Display error message
+    end

@@ -1,0 +1,163 @@
+classDiagram
+direction TB
+    class User {
+	    - int user_id
+	    - string name
+	    - string tel
+	    - string password
+    }
+    class Member {
+	    - list order_list
+	    - list address_list
+	    - Payment payment
+	    - int point
+	    - list coupon_list
+	    - Cart cart
+	    - int current_id
+	    - string lastname
+	    + add_to_cart(menu, quantity, addons=None, sizes=None)
+	    + set_payment_method(payment_method : Payment)
+	    + checkout()
+	    + create_order()
+	    + pay_order(order_id, payment_method)
+	    + add_coupon_to_list(coupon : Coupon)
+	    + remove_coupon(coupon : Coupon)
+	    + exchange_point_to_coupon(coupon_code)
+	    + add_address(name, detail)
+	    + view_order_history()
+    }
+    class Admin {
+	    - string type
+	    + view_orders(system)
+	    + manage_menu(system, action, menu_item, menu_id)
+    }
+    class Menu {
+	    - string category
+	    - int menu_id
+	    - string name
+	    - float price
+	    - string detail
+	    - string src
+    }
+    class Burger {
+	    - Dict addons
+	    + add_addon(addon, price)
+	    + calculate_total_price()
+	    + __str__()
+    }
+    class Beverage {
+	    - string size
+	    + get_size()
+	    + set_size()
+    }
+    class Snack {
+    }
+    class MenuSet {
+	    - list menu_set_list
+	    + add_menu_item(menu)
+	    + remove_menu_item(menu)
+    }
+    class Order {
+	    - int order_id
+	    - string status
+	    - instance member
+	    - float total_price
+	    - list cart_items
+	    - instance payment
+	    + add_item()
+	    + remove_item()
+	    + calculate_total()
+    }
+    class Cart {
+	    - list item_list
+	    - Coupon applied_coupon
+	    + add_item(menu, quantity, total_price, cart_addons=None, cart_sizes=None)
+	    + apply_coupon(coupon, member)
+	    + calculate_total_price()
+	    + remove_item(menu, addons=None, sizes=None)
+	    + checkout()
+	    + __str__()
+    }
+    class CartItem {
+	    - Menu menu
+	    - int amount
+	    - float total_price
+	    - list addons
+	    - string sizes
+	    + update_quantity()
+	    + __str__()
+    }
+    class Payment {
+	    - int payment_id
+	    - string date
+	    - float total_price
+	    - string status
+	    - string discount
+	    - instance payment_method
+	    + refund_payment()
+    }
+    class PaymentMethod {
+	    - int payment_method_id
+	    - string payment_method_name
+	    + process_payment(amount)
+    }
+    class QRCode {
+	    - str qr_code_data
+    }
+    class CreditCard {
+	    - string card_number
+	    - string expiry_date
+	    - string cvv
+    }
+    class Coupon {
+	    - string name
+	    - float discount
+	    - string expire_date
+    }
+    class System {
+	    - list user_list
+	    - list menu_list
+	    - insatance payment_method
+	    + register(new_user)
+	    + add_coupon(coupon : Coupon)
+	    + add_menu(menu_item)
+	    + remove_menu(menu_id)
+	    + filter_category(target_category)
+	    + search_products_by_name(search: str)
+	    + add_user_list(user)
+	    + display_menu()
+	    + check_password(input_username, input_passwd)
+	    + select_menu(menu_id)
+	    + search_menu_by_id(menu_id)
+	    + search_user_by_id(user_id)
+	    + watch_cart(user_id)
+	    + remove_from_cart(user_id,menu,addon=None,size=None)
+	    + show_total_price(user_id)
+	    + checkout(user_id)
+	    + show_user_coupon(user_id)
+	    + apply_coupon(user_id,coupon)
+	    + create_order(user_id)
+	    + pay_order(user_id,order,payment_method)
+	    + exchange_point_to_coupon(user_id,point)
+	    + add_to_cart(user_id, menu_item, quantity, addon=None,size = None)
+    }
+
+    Menu <|-- Burger
+    Menu <|-- Beverage
+    Menu <|-- Snack
+    Menu <|-- MenuSet
+    User <|-- Member
+    User <|-- Admin
+    Member --> Cart
+    Member --> Order
+    Order --> CartItem
+    CartItem --> Menu
+    Order --> Payment
+    System --> User
+    System --> Menu
+    System --> Order
+    System --> Coupon
+    QRCode --|> PaymentMethod
+    CreditCard --|> PaymentMethod
+    Payment <|-- PaymentMethod
+    Cart -- CartItem
