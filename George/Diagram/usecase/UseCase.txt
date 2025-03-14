@@ -1,0 +1,28 @@
+@startuml
+actor User
+actor Admin
+left to right direction
+
+User -- (watch_menu)
+User -- (watch_cart)
+User -- (sel_address)
+Admin -- (admin_page)
+User -- (Coupon)
+
+(Coupon) <.down.(exchange_point_to_coupon):<<extend>>
+(sel_address) <.down.(add_new_address):<<extend>>
+(watch_menu)<.down.(All_menu):<<extend>>
+(watch_menu)<.down.(Burger):<<extend>>
+(watch_menu)<.down.(Beverage):<<extend>>
+(watch_menu)<.down.(Snack):<<extend>>
+(watch_menu)<.down.(Menu Set):<<extend>>
+(watch_menu)<.down.(find_menu):<<extend>>
+(watch_menu)<.down.(Show_detail_menu):<<extend>>
+(Show_detail_menu)<.down.(add_cart):<<extend>>
+(watch_cart)<.down.(check_out):<<extend>>
+(check_out)<.down.(order_summary):<<extend>>
+(order_summary)<.down.(payment_method):<<extend>>
+(admin_page)<.down.(view_member_order):<<extend>>
+(admin_page)<.down.(manage_product):<<extend>>
+(admin_page)<.down.(managa_coupon):<<extend>>
+@enduml
