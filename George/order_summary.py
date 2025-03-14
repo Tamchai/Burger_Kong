@@ -90,6 +90,7 @@ def order_summary(current_user_id: int):
                         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
                         margin: auto;
                         margin-bottom: 10px;
+                        overflow-y: auto;
                     """
                 ),
                 Div(
@@ -108,7 +109,7 @@ def order_summary(current_user_id: int):
                             )
                             for item in cart.get_item_list()
                         ],
-                        style="width: 100%; padding: 20px; background: #f5ebdc; border-radius: 15px;"
+                        style="width: 100%; padding: 20px; background: #f5ebdc; border-radius: 15px; overflow-y: auto;"
                     ),
                     Div(
                         Div(
@@ -150,13 +151,24 @@ def order_summary(current_user_id: int):
                         Button("Checkout", type="submit", style="background-color: #D00000; color: #ffffff; width: 100%; padding: 12px; border: none; border-radius: 8px; margin-top: 10px;"),
                         style="width: 100%;"
                     ),
-                    style="display: flex; justify-content: space-between; background: #f5ebdc; padding: 15px; border-radius: 30px; width: 80%; margin: auto; margin-top: 20px; border: 1px solid #502314; gap: 20px;"
-                ),
+                    style="""
+                    display: flex; 
+                    justify-content: space-between; 
+                    background: #f5ebdc; 
+                    padding: 15px; 
+                    border-radius: 30px; 
+                    width: 80%; 
+                    margin: auto; 
+                    margin-top: 20px; 
+                    border: 1px solid #502314; 
+                    gap: 20px; 
+                    overflow-y: auto;
+                    """),
                 method="GET",
                 action=f"/before_payment/{current_user_id}",
-                style="background: #f5ebdc; padding: 20px; border-radius: 20px; width: 80%; margin: auto; margin-top: 30px;"
+                style="background: #f5ebdc; padding: 20px; border-radius: 20px; width: 80%; margin: auto; margin-top: 30px; overflow-y: auto;"
             ),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 100px;"
+            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 100px; overflow-y: auto;"
             )
 )
             

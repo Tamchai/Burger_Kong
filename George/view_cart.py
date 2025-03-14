@@ -92,20 +92,19 @@ def view_cart(current_user_id : int):
                                             action="/refresh",
                                             style="background: #D00000; color: white; padding: 5px 10px; border: none; border-radius: 10px; text-align: center; margin-left: 10px;"),
                                     style="font-size: 20px; font-weight: bold; color: #502314; padding: 5px; gap 50px; display: flex; justify-content: space-between; align-items: center;"),
-                                style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid rgba(80, 35, 20, 0.2); padding: 5px 0;"
+                                style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid rgba(80, 35, 20, 0.2); padding: 5px 0; overflow-y: auto;"
                             ) 
                                 for item in user.get_cart().get_item_list()],
-                            style="flex-grow: 1; width: 98%; align-items: flex-start;  padding: 10px;"
+                            style="flex-grow: 1; width: 98%; align-items: flex-start; padding: 10px; overflow-y: auto;"
                         ),
                         Div(
-                            H3("Discount:", style="color: #502314;"),
                             Div(
                                 H2(f"Total: ${user.get_cart().calculate_total_price():.2f}", id="total", style="color: #D00000; font-weight: bold; margin-top: 10px;")
                             ),  
                             Div(
                                 Button("Checkout",style="font-size: 20px; font-weight: bold; background-color: #D00000; color: #ffffff; width: 50%; padding: 10px; border: none; display: block; margin: auto; border-radius: 10px;",onclick=f"window.location.href='/order_summary/{current_user_id}'"),
                                 action =f"/order_summary/{current_user_id}", method = "GET",
-                                style="width: 100%; display: flex; justify-content: center; margin-top: 15px;"
+                                style="width: 100%; display: flex; justify-content: center; margin-top: 15px; position: sticky; bottom: 0; background: #f5ebdc; padding: 10px;"
                             ),
                             style="display: flex; flex-direction: column; width: 100%; padding-top: 15px; margin-top: auto;"
                         ),

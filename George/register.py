@@ -2,6 +2,7 @@ from fasthtml.common import *
 from routing import app, rt
 import server
 from server import Admin
+
 system = server.system
 user_id = None
 @rt('/', methods=["GET","POST"])

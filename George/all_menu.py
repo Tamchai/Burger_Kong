@@ -159,44 +159,47 @@ def home():
         ),
         Body(
             # H1(server.current_user_id),
-            Form(Div(
-                *[Button(text, name="category", value=text, id=text, 
-                style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;")
-                for text in ["All Menu", "Combo Set", "Burger", "Beverage", "Snack"]]
-,
-                style="""
-                    position: absolute;
-                    left: 0;
-                    right: 0;
-                    padding: 20px; 
-                    background: #f8e3c2; 
-                    margin-top: 40px; 
-                    width: 100%; 
-                    align-items: center;
-                    display: flex;
-                    justify-content: center;
-                    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
-                """
-            ),
-                        hx_get="/filter",
-                        target_id="results",
-                        hx_trigger="click"),
+            Form(
+                Div(
+                    *[Button(text, name="category", value=text, id=text, 
+                    style="font-size: 36px; margin: 0 20px; font-weight: bold; color: #502314; background: none; border: none; cursor: pointer;")
+                    for text in ["All Menu", "Combo Set", "Burger", "Beverage", "Snack"]],
+                    style="""
+                        position: absolute;
+                        top: 50px;
+                        left: 0;
+                        right: 0;
+                        margin-bottom: 0px;
+                        padding: 20px; 
+                        background: #f8e3c2; 
+                        margin-top: 40px; 
+                        width: 100%; 
+                        align-items: center;
+                        display: flex;
+                        justify-content: center;
+                        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+                    """
+                ),
+                hx_get="/filter",
+                target_id="results",
+                hx_trigger="click"),
             Div(
                 Grid(
                     Div(*[product_card(p) for p in system.get_menu_list()],
                     style="""
                         display: grid;
-                        grid-template-columns: repeat(4, 1fr);
+                        grid-template-columns: repeat(4, 1fr);  
                         gap: 15px;
                         justify-items: center;
                         align-items: center;
-                        margin-top: 160px;
+                        margin-top: 10%; 
                         padding: 20px;
                         background-color: #f5ebdc;
+                        min-height: 0;
                     """),
                 ),
             id="results"),
-            style="background: #f5ebdc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin-top: 3%;"
+            style="background: #f5ebdc; min-height: 100vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; margin-top: 3%;"
         )
     )
 
@@ -386,29 +389,6 @@ def post( menu_id: int, count: int = Form(1),More_Patty: Optional[str] = Form(No
     count = 1
     return RedirectResponse("/home")
 
-
-# add to cart and send total price of menu 
-# @rt('/save/{menu_id}', methods=['POST'])
-# def post(More_Patty = None, Bacon =None, More_Cheese = None, count=None, menu_id=None, size = None):
-#     global current_user_id
-#     menu_id = system.select_menu(menu_id)
-#     print(menu_id)
-#     if isinstance(menu_id, Burger):
-#         RedirectResponse("/home")
-#         print(f"Add-ons: More Patty = {More_Patty}, Bacon = {Bacon}, More Cheese = {More_Cheese}")
-#         system.add_to_cart(server.current_user_id, menu_id, count, [More_Patty, Bacon, More_Cheese])
-#     elif isinstance(menu_id, Beverage):
-#         RedirectResponse("/")
-#         # print(f"Size: {size}")
-#         system.add_to_cart(server.current_user_id, menu_id, count, size)
-       
-#     else:
-#         RedirectResponse("/coupon_member")
-#         # system.add_to_cart(server.current_user_id, menu_id, count)
-
-#     count = 1
-#     return RedirectResponse("/home")
-
 @app.post("/increment")
 def increment():
     global base_price
@@ -462,36 +442,5 @@ async def update_price(
     if More_Cheese == "More_Cheese":
         total_price += 0.5 * count 
         print("More Cheese selected")
-
     return f"Price - {total_price:.2f}$"
-
-
-# @rt('/save/burger/{menu_id}', methods=['POST'])
-# def post_burger(More_Patty: str, Bacon: str, More_Cheese: str, count: int, menu_id: int):
-#     global current_user_id
-#     menu_id = system.select_menu(menu_id)
-
-#     if isinstance(menu_id, Burger):
-#         print(f"Add-ons: More Patty = {More_Patty}, Bacon = {Bacon}, More Cheese = {More_Cheese}")
-#         system.add_to_cart(server.current_user_id, menu_id, count, [More_Patty, Bacon, More_Cheese])
-#     else:
-#         return "Invalid menu item"
-
-#     count = 1
-#     return RedirectResponse("/home")
-
-# @rt('/save/beverage/{menu_id}', methods=['POST'])
-# def post_beverage( count: int, menu_id: int,size: Optional[str] = Form(None)):
-#     global current_user_id
-#     menu_id = system.select_menu(menu_id)
-
-#     if isinstance(menu_id, Beverage):
-#         print(f"Size: {size}")
-#         system.add_to_cart(server.current_user_id, menu_id, count, size)
-#     else:
-#         return "Invalid menu item"
-
-#     count = 1
-#     return RedirectResponse("/home")
-
 serve()

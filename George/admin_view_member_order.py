@@ -34,30 +34,31 @@ def get():
                 *[
                     Div(
                         *[(
-                                Div(
-                                    H2(member.get_name(), style="color: #502314;"),
+                            Div(
+                                H2(member.get_name(), style="color: #502314;"),
                                     style="color: #502314; display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 10px;"
                                 ),
                                 Div(
-                                        Div(
-                                            f"Order ID : {order.get_id()}",
+                                    Div(
+                                        f"Order ID : {order.get_id()}",
+                                            style="font-size: 24px; font-weight: bold; color: #502314; padding: 5px;"
+                                    ),
+                                    Div(
+                                        f"Order Detail : ",
+                                            *[P(each_order, style="font-size: 18px;color: #502314; padding: 5px;") for each_order in order.get_cart_items()],
                                             style="font-size: 18px; font-weight: bold; color: #502314; padding: 5px;"
-                                        ),
-                                        Div(
-                                            f"Order Detail : ",
-                                            *[P(each_order) for each_order in order.get_cart_items()],
-                                            style="font-size: 18px; font-weight: bold; color: #502314; padding: 5px;"
-                                        ),style="padding-left: 10px;"
+                                    ),
+                                style="padding-left: 10px;"
                                 ),
-                                Div(H3(
-                                    f"Total Price: {order.get_total_price()+2} $",
-                                    style=""" 
-                                        color: #502314; 
-                                        padding: 5px 10px; 
-                                        border-radius: 10px; 
-                                        
-                                    """
-                                )),
+                                Div(
+                                    H3(
+                                        f"Total Price: {order.get_total_price()+2} $",
+                                        style=""" 
+                                            color: #502314; 
+                                            padding: 5px 10px; 
+                                            border-radius: 10px;
+                                        """)
+                                    ),
                                 H3(
                                     f"{order.get_status().capitalize()}",
                                     style="""
@@ -66,8 +67,8 @@ def get():
                                         padding: 5px 10px; 
                                         border-radius: 10px; 
                                         text-align: center;
-                                    """
-                            ) )for order in member.get_order_list()
+                                    """) 
+                                )for order in member.get_order_list()
                         ],
                         style="""
                             background: white; 
@@ -77,9 +78,8 @@ def get():
                             text-align: left; 
                             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
                             margin: 1%;
-                        """
-                    
-                    ) for member in member_list if isinstance(member, Member)
+                        """) 
+                    for member in member_list if isinstance(member, Member)
                 ],
                 style="""
                     display: flex; 

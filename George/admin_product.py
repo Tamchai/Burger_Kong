@@ -84,7 +84,8 @@ def product_manager():
                   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
                   margin: auto;
                   position: relative;
-                  top: -50px;
+                  margin-top: 20px;
+                  margin-bottom: 50px;
                 """
             ),
             Table(
