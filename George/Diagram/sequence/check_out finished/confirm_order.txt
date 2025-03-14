@@ -1,0 +1,34 @@
+actor User
+participant UI
+participant System
+participant Member
+participant Cart
+
+User ->> UI: Click "Checkout" button
+activate UI
+UI ->> System: checkout(user_id)
+activate System
+System ->> System: search_user_by_id(user_id)
+deactivate System
+
+alt if user exists
+    System ->> Member: checkout()
+    activate Member
+    Member ->> Cart: get_cart_details()
+    activate Cart
+    Cart -->> Member: return cart summary
+    deactivate Cart
+    Member -->> System: return cart summary
+    deactivate Member
+    System -->> UI: return cart summary
+    activate System
+    deactivate System
+    UI -->> User: Display order summary
+    deactivate UI
+else user not found
+    System -->> UI: return "Error: User not found"
+    activate System
+    deactivate System
+    UI -->> User: Display error message
+
+end

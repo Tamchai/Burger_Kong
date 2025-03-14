@@ -1,0 +1,61 @@
+    actor User
+    participant UI
+    participant System
+    participant Member
+    participant Cart
+    participant CartItem
+
+    User ->> UI : Click "Add to Cart" button
+    activate UI
+    UI ->> System : add_to_cart(user_id, selected_menu, qty, addons, sizes)
+    deactivate UI
+
+    activate System
+    System ->> System : search_user_by_id(user_id)
+    System <<-- System : user found
+
+    System ->> System : search_menu_by_id(menu_id)
+    System <<-- System : menu found
+
+    alt if selected_menu == Burger
+        loop for addon in addons
+            alt if addon in selected_menu.get_addons()
+                System ->> System: total_price += addon price * qty
+                System <<-- System: updated total_price
+            else addon not available
+                System ->> System: ignore addon
+                System <<-- System: addon ignored
+            end
+        end
+    end
+
+    alt if selected_menu == Beverage
+        System ->> System: total_price += menu_price * size_price[sizes]
+        System <<-- System: updated total_price
+    end
+
+    System ->> Member : add_to_cart(selected_menu, qty, addons, sizes)
+    activate Member
+    Member ->> Cart : add_item(selected_menu, qty, total_price, addons, sizes)
+    activate Cart
+
+    loop check if item exists
+        Cart ->> Cart : check existing item
+        alt if item exists with same addons/sizes
+            Cart ->> Cart : update_quantity(qty)
+            Cart <<-- Cart : quantity updated
+        else if new item
+            Cart ->> CartItem : create_instance(selected_menu, qty, total_price, addons, sizes)
+            activate CartItem
+            CartItem <<-- Cart : Item created
+            deactivate CartItem
+        end
+    end
+
+    Cart -->> Member : Item added to cart
+    deactivate Cart
+    Member -->> System : Success
+    deactivate Member
+    System -->> UI : Success
+    deactivate System
+    UI -->> User : Display "Item added to cart successfully"

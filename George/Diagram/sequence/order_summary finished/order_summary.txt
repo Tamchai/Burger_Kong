@@ -1,0 +1,52 @@
+actor User
+participant UI
+participant System
+participant Member
+participant Cart
+participant Order
+
+User ->> UI: Click "Confirm Order" button
+activate UI
+UI ->> System: create_order(user_id)
+activate System
+System ->> System: search_user_by_id(user_id)
+deactivate System
+
+alt if user exists
+    System ->> Member: create_order()
+    activate Member
+    Member ->> Cart: get_item_list()
+    activate Cart
+    Cart -->> Member: return item_list
+    deactivate Cart
+
+    alt if cart is empty
+        Member -->> System: return "Error: Cart is empty!"
+        System -->> UI: return "Error: Cart is empty!"
+        UI -->> User: Display error message
+    else if cart has items
+        Member ->> Cart: calculate_total_price()
+        activate Cart
+        Cart -->> Member: return total_price
+        deactivate Cart
+
+        Member ->> Order: create Order(order_id, member, total_price, status="pending" delivery_address)
+        activate Order
+        Order -->> Member: return order_id
+        deactivate Order
+
+        Member ->> Member: increment current_order_id
+        Member ->> Member: store order in order_list
+        Member ->> Member: reset cart (create new Cart)
+        Member -->> System: return order_id
+        deactivate Member
+        System -->> UI: return order_id
+        UI -->> User: Display "Order confirmed successfully"
+        deactivate UI
+    end
+else user not found
+    System -->> UI: return "Error: User not found"
+
+    UI -->> User: Display error message
+
+end

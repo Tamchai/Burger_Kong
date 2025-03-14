@@ -1,0 +1,19 @@
+sequenceDiagram
+    actor Admin
+    participant UI
+    participant System
+
+    Admin ->> UI: click "Coupon Manager"
+    UI ->> System : get_coupon_list()
+    System -->> UI: Return coupon_lis
+
+    Admin ->> UI: Fill in coupon details and click "Add"
+    UI ->> System: click "Add"
+    System ->> System: Create a new Coupon instance
+    System ->> System: Add product to coupon_list
+    System -->> UI: Refresh coupon table
+
+    Admin ->> UI: Click "Delete" on a coupon
+    UI ->> System: Send delete request
+    System ->> System: Remove coupon from coupon_list
+    System -->> UI: Update coupon table 

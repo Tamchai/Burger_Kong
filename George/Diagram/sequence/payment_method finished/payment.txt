@@ -1,0 +1,80 @@
+actor User
+participant UI
+participant System
+participant Member
+participant Order
+participant PaymentMethod
+
+User ->> UI: Click "Pay Order" button
+activate UI
+UI ->> System: pay_order(user_id, order_id, payment_method)
+activate System
+System ->> System: search_user_by_id(user_id)
+deactivate System
+
+alt if user exists
+    System ->> Member: pay_order(order_id, payment_method)
+    activate Member
+    
+    loop search for order
+        Member ->> Member: check if order_id exists
+    end
+    
+    alt if order not found
+        Member -->> System: return "Error: Order not found."
+        deactivate Member
+        System -->> UI: return "Error: Order not found."
+        activate System
+        deactivate System
+        UI -->> User: Display error message
+        deactivate UI
+    else if order exists
+        Member ->> Order: get_status()
+        activate Order
+        Order -->> Member : return status 
+        
+        alt if order is not "pending"
+            Member -->> System: return "Error: Order already processed."
+            
+            System -->> UI: return "Error: Order already processed."
+            activate System
+            deactivate System
+            UI -->> User: Display error message
+        else if order is "pending"
+            Order ->> PaymentMethod: process_payment(order.total_price)
+            activate PaymentMethod
+            PaymentMethod -->> Order: return payment_status
+            
+            deactivate PaymentMethod
+            
+            alt if payment is successful
+                Order ->> Order: set_status("paid")
+            deactivate Order
+                Member ->> Member: increase loyalty points (+10)
+                Member -->> System: return "Order successfully paid."
+   
+                System -->> UI: return "Order successfully paid."
+                activate System
+                deactivate System
+                UI -->> User: Display success message
+
+            else if payment fails
+                Member -->> System: return "Payment failed: payment_status"
+                System -->> UI: return "Payment failed: payment_status"
+                activate System
+                deactivate System
+                UI -->> User: Display failure message
+ 
+            end
+        end
+  
+    end
+else order not found
+    Member -->> System: return "Error : order not found"
+ 
+    System -->> UI: return "Error: order not found"
+    activate System
+    deactivate System
+    UI -->> User: Display error message
+  
+end

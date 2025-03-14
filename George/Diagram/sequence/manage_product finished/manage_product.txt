@@ -1,0 +1,18 @@
+ actor Admin
+    participant UI
+    participant System
+
+    Admin ->> UI: click "Product Manager"
+    UI ->> System : get_menu_list()
+    System -->> UI: return menu_list
+
+    Admin ->> UI: Fill in product details and click "Add"
+    UI ->> System: Send new menu details
+    System ->> System: Create a new menu instance
+    System ->> System: Add menu to menu_list
+    System -->> UI: Refresh menu table
+
+    Admin ->> UI: Click "Delete" on a menu
+    UI ->> System: Send delete request
+    System ->> System: Remove menu from menu_list
+    System -->> UI: Update menu table

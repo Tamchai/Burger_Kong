@@ -1,0 +1,31 @@
+    actor User
+    participant UI
+    participant System
+    participant Member
+    participant Cart
+
+    User ->> UI : Click "View Cart" button
+    activate UI
+    UI ->> System : watch_cart(user_id)
+    activate System
+    System ->> System : search_user_by_id(user_id)
+    activate System
+    System -->> System : user lookup result
+    deactivate System
+
+    alt if user exists
+        System ->> Member : get_cart()
+        activate Member
+        Member ->> Cart : get_cart_details()
+        activate Cart
+        Cart -->> Member : return cart details
+        deactivate Cart
+        Member -->> System : return cart details
+        deactivate Member
+        System -->> UI : return cart details
+    else user not found
+        System -->> UI : return "Error: User not found"
+    end
+    deactivate System
+    UI -->> User : Display result (cart contents or error)
+    deactivate UI

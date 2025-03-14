@@ -1,0 +1,29 @@
+sequenceDiagram
+    actor Member
+    participant UI
+    participant System
+    participant Menu
+    participant Member
+    Member ->>+ UI : User Open website 
+    UI ->>+ System : display_menu()
+    loop for menu in menu_list
+        System ->>+ Menu : get_Detail()
+        Menu -->>- System : return Detail
+        System ->> System : append to all_menu_list[]
+    end
+    System -->>- UI : return all_menu_list[]
+    UI -->>- Member : Show all menu
+
+    Member ->>+ UI : User Select Menu
+    UI ->>+ System : select_menu(menu_id)
+    loop menus in menu_list
+        System ->>+ Menu : menus.get_id()
+        Menu -->>- System : return menus_id()
+    end
+    System -->>- UI : return menu
+    UI -->>- Member : Show Selected Menu
+
+
+     
+
+

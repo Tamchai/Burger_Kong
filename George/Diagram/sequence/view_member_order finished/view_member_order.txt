@@ -1,0 +1,61 @@
+actor ADMIN
+participant UI
+participant System
+participant Admin
+participant Member
+participant Order
+
+ADMIN ->> UI: Click "View All Orders"
+activate UI
+UI ->> System: view_orders(admin_user_id)
+activate System
+System ->> System: search_user_by_id(admin_user_id)
+deactivate System
+
+alt if user is an admin
+    System ->> Admin: view_orders(system)
+    activate Admin
+
+    loop retrieve all users
+        Admin ->> System: get_user_list()
+        activate System
+        System -->> Admin: return user list
+        deactivate System
+    end
+
+    alt if users exist
+        loop check each user
+            Admin ->> Member: get_order_list()
+            activate Member
+            Member -->> Adminn: return order list
+            deactivate Member
+        end
+
+        alt if orders exist
+            Admin -->> System: return all orders
+            activate System
+            System -->> UI: return all orders
+            deactivate System
+            UI -->> ADMIN: Display all orders
+            deactivate UI
+        else no orders found
+            Admin -->> System: return "No orders found."
+            activate System
+            System -->> UI: return "No orders found."
+            deactivate System
+            UI -->> ADMIN: Display "No orders found."
+        end
+    else no users exist
+        Admin -->> System: return "No users found."
+        activate System
+        System -->> UI: return "No users found."
+        deactivate System
+        UI -->> ADMIN: Display "No users found."
+    end
+    deactivate Admin
+else user is not admin
+    System -->> UI: return "Error: Access Denied."
+    activate UI
+    UI -->> ADMIN: Display error message
+    deactivate UI
+end

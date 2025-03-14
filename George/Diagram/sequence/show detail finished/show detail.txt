@@ -1,0 +1,20 @@
+    actor USER
+    participant UI
+    participant System
+    participant Menu
+	  USER ->> UI : User Select Menu
+    activate UI
+    UI ->> System : select_menu(menu_id)
+    activate System
+    loop menus in menu_list
+        System ->> Menu : get_id()
+        activate Menu
+        Menu -->> System : return id
+        deactivate Menu
+        alt if menu_id == id
+            System -->> UI : return menu
+            deactivate System
+        end
+    end
+    UI -->> USER : Show Selected Menu
+    deactivate UI

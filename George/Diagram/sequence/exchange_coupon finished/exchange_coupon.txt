@@ -1,0 +1,35 @@
+actor User
+    participant UI
+    participant System
+    participant Member
+    
+    User ->> UI : click : Exchange Coupon
+    UI ->> System : system.exchage_point_to_coupon(user_id,coupon_name)
+    loop find member
+    System ->> System: member = search_user_by_id(user_id)
+    end
+    System ->> Member : member.exchange_point_coupon(coupon_name)
+    Member ->> System : get_coupon_list
+    System ->> Member : return coupon_list
+     loop find available_coupon
+            Member ->> Member : Check if coupon_name matches
+        end
+    alt if coupon found
+            Member ->> Member : required_points = selected_coupon.get_discount * 10
+            alt if enough points
+                Member ->> Member : self.__point -= require_point
+                Member ->> Member : self.__coupon_list.append(selected_coupon)
+                Member ->> System : return Success 
+                System ->> UI : return Success
+                UI ->> User : Display Success
+            
+            else if not enough points
+                Member ->> System : return Not enough points. 
+                System ->> UI : return Coupon Not enough points.
+                UI ->> Member : Display Coupon Not enough points.
+            end
+    else coupon not found
+            Member ->> System : return Coupon Not Found 
+            System ->> UI : return Coupon Not Found
+            UI ->> Member : Display Coupon Not Found
+            end
