@@ -1,0 +1,68 @@
+sequenceDiagram
+    participant User
+    participant UI
+    participant System
+    participant Member
+    participant Cart
+    participant Order
+    participant Payment
+    participant Payment_method
+    participant Creditcard
+    participant QRCode
+
+    User->>UI: Click "Place Order"
+    UI->>System:  get_total_price()
+
+    System->>Member: validate cart
+     activate Member
+    Member->>Cart: validateCart()
+    activate Cart
+    Cart-->>Member: Cart is valid?
+     deactivate Cart
+
+    Member->>Cart: getTotal()
+       activate Cart
+    Cart-->>Member: Return total price
+     deactivate Cart
+    deactivate Member
+    Member->>System: Proceed to payment
+    activate System
+    System->>Payment: Create payment (total_price)
+    activate Payment
+    Payment->>Payment_method: Select payment method
+    activate Payment_method
+
+    alt Payment via Credit Card
+        Payment_method->>Creditcard: processPayment(total_price)
+        activate Creditcard
+        Creditcard-->>Payment_method: Payment Successful
+        deactivate Creditcard
+    else Payment via QR Code
+        Payment_method->>QRCode: processPayment(total_price)
+        activate QRCode
+        QRCode-->>Payment_method: Payment Successful
+        deactivate QRCode
+    else Payment Failed
+        Payment_method-->>Payment: Payment Failed
+        deactivate Payment_method
+        Payment-->>System: Notify failure
+        deactivate Payment
+        System-->>UI: Display "Payment Failed"
+        deactivate System
+        UI-->>User: Show error message
+    end
+
+
+    alt Payment Successful
+        System->>Order: Create new order (order_id, cart)
+        activate Order
+        Order-->>Member: Order Created
+         deactivate Order
+        Member->>Cart: emptyCart()
+       activate Cart
+        Cart-->>Member: Cart emptied
+       deactivate Cart
+        System-->>UI: Display "Order Placed Successfully"
+        UI-->>User: Show ordered
+   
+    end
